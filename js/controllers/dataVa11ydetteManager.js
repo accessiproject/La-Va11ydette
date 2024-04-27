@@ -6,8 +6,7 @@
 	/* @TODO virer partie audit */
 	if (checklistVallydette[currentCriteriaListName].template === 'audit'){
 		criteriaVallydette.forEach(function (criteria, key) {
-			 criteria.resultatTest = "nt";
-			 
+				criteria.resultatTest = "nt";
 		 })
 	}
 
@@ -39,19 +38,65 @@
 	utils.setPageTitle();
 	
 	//eventHandler();
-	
+	importDataset();
 	runVallydetteApp();
+}
+
+
+/**
+ *  import the pseudo audit for the dev step
+ */
+function importDataset() {
+    // path of JSON file dataset
+    var pathFileJSON = '../json/audit-de-conformit-rgaa-4-1-2024-4-27-6-32-7.json';
+    
+    // Création d'une requête AJAX pour charger le fichier JSON
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', pathFileJSON, true);
+    xhr.responseType = 'text';
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            var dataFile = JSON.parse(xhr.responseText);
+            if (dataFile.hasOwnProperty('checklist')) {
+                dataVallydette = managementDeprecatedComment(dataFile);
+                if (dataVallydette.checklist.referentiel === "wcagEase") {
+                    dataVallydette.checklist.referentiel = "wcag-web";
+                }
+                currentCriteriaListName = dataVallydette.checklist.referentiel;
+                initAuditPage();
+                initGlobalLang(dataVallydette.checklist.lang, true);
+                initGlobalTemplate(dataVallydette.checklist.template);
+                checkTheVersion(dataVallydette.checklist.version);
+                loadIssue();
+                utils.putTheFocus(document.getElementById("checklistName"));
+                runLangRequest();
+                setTimeout(function () { jsonUpdate(); }, 500);
+            }
+        } else {
+            console.error('Erreur lors du chargement du fichier JSON');
+        }
+    };
+
+    xhr.onerror = function () {
+        console.error('Erreur lors du chargement du fichier JSON');
+    };
+    
+    xhr.send();
 }
 
 /**
  *  Initialization of events for import button, and checklist name edition button.
- */
- function eventHandler() {
-
+*/
+function eventHandler() {
+	
 	var btnImport = document.getElementById('import');
 	
 	btnImport.onclick = function () {
 		var files = document.getElementById('selectFiles').files;
+		
+		console.log("files");
+		console.log(files);
+		
 		let alert = document.getElementById('import-alert');
 		alert.classList.add('d-none');
 
@@ -63,15 +108,27 @@
 			var fr = new FileReader();
 
 			fr.onload = function (e) {
+				
 				let dataFile = JSON.parse(e.target.result);
+				
+				console.log("dataFile");
+				console.log(dataFile);
+				
 				if (dataFile.hasOwnProperty('checklist')) {
+					
 					dataVallydette = managementDeprecatedComment(dataFile);
-						
+					
+					console.log("dataVallydette");
+					console.log(dataVallydette);
+					
 					//fix obsolete referentiel name (from 1.4 checklist version)
 					if (dataVallydette.checklist.referentiel === "wcagEase") {
 						dataVallydette.checklist.referentiel = "wcag-web";
 					}
+					
+					console.log("url");
 					console.log(dataVallydette.checklist.page[0].url)
+					
 					currentCriteriaListName = dataVallydette.checklist.referentiel;
 					initAuditPage();
 					initGlobalLang(dataVallydette.checklist.lang, true);
@@ -90,9 +147,8 @@
 			}
 			fr.readAsText(files.item(0));	
 		}
-		
 	};
-
+	
 	var btnExport = document.getElementById('export');
 
 	btnExport.onclick = function(){
@@ -110,7 +166,7 @@
  *  Initialization of events for name audit button, and local Storage button.
  */
 
- function AuditEventHandler(){
+function AuditEventHandler(){
 	var btnChecklist = document.getElementById("btnChecklistName");
 
 

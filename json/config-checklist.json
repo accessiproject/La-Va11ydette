@@ -1,5 +1,4 @@
 {
-
 	"wcag-web": {
 		"filename": "criteres-wcag-ease",
 		"template": "wcag",
@@ -35,8 +34,7 @@
 		"description-en": "Audit grid to assess the level of compliance of a IOS application with WCAG 2.2 A and AA criteria",
 		"about-fr": "https://a11y-guidelines.orange.com/fr/mobile/ios/audit-wcag/",
 		"about-en": "https://a11y-guidelines.orange.com/en/mobile/ios/wcag-audit/"
-	}
-	,
+	},
 	"rgaa": {
 		"filename": "criteres-rgaa",
 		"template": "rgaa",
