@@ -17,13 +17,14 @@
 						if(item.commentaire!==""){
 							newIssue = {
 								issueTitle : item.commentaire,
+								issueUserImpact : "",
 								issueDetail : "",
 								issueSolution : "",
-								issueTechnicalSolution:""
+								issueTechnicalSolution : ""
 							};
 							item.issues.push(newIssue);
 						}
-						delete item.commentaire	
+						delete item.commentaire
 					}
 				})
 			}
@@ -65,18 +66,28 @@ setIssue = function (targetId, title, targetIdOrigin) {
 	htmlModal += '<div class="modal-dialog modal-lg " role="document">';
 	htmlModal += '<div class="modal-content">';
 	htmlModal += '<div class="modal-header">';
-	htmlModal += '<h5 class="modal-title" id="modalAddIssueTitle">' + langVallydette.issueTxt1 + titleModal + '</h5>';
+	htmlModal += '<h1 class="modal-title" id="modalAddIssueTitle">' + langVallydette.issueTxt1 + titleModal + '</h1>';
 	htmlModal += '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + langVallydette.close + '"></button>';
 	htmlModal += '</div>';
 	htmlModal += '<form id="editIssueForm">';
 	htmlModal += '<div class="modal-body">';
 	htmlModal += '<p class="text-muted">' + langVallydette.fieldRequired + '</p>';
 	htmlModal += (issuesVallydette[targetIdOrigin]) ? getPredefinedIssues(targetIdOrigin) : "";
+	
 	htmlModal += '<div class="mb-3">';
 	htmlModal += '<label class="form-label" for="issueNameValue" id="issueNameValueLabel">' + langVallydette.summary + ' <span class="text-danger">*</span></label>';
 	htmlModal += '<input type="text" class="form-control" id="issueNameValue" aria-labelledby="issueNameValueLabel" value="" required aria-invalid="false">';
 	htmlModal += '<div id="issueNameValueError" class="alert alert-danger alert-sm d-none"><span class="alert-icon" aria-hidden="true"></span><p>' + langVallydette.summaryError + ' </p></div>';
 	htmlModal += '</div>';
+
+	htmlModal += '<div class="mb-3">';
+	htmlModal += '<select class="form-select" id="issueUserImpactValue" aria-label="' + langVallydette.select + ' ">';
+	htmlModal += '<option value="' + langVallydette.userImpact1 + '">' + langVallydette.userImpact1 + '</option>';
+	htmlModal += '<option value="' + langVallydette.userImpact2 + '">' + langVallydette.userImpact2 + '</option>';
+	htmlModal += '<option value="' + langVallydette.userImpact3 + '">' + langVallydette.userImpact3 + '</option>';
+	htmlModal += '</select>';
+	htmlModal += '</div>';
+
 	htmlModal += '<div class="mb-3">';
 	htmlModal += '<label class="mt-2 form-label" for="issueDetailValue" id="issueDetailValueLabel">' + langVallydette.description + ' <span class="text-danger">*</span></label>';
 	htmlModal += '<textarea class="form-control" id="issueDetailValue" aria-labelledby="issueDetailValueLabel" rows="8" required aria-invalid="false"></textarea>';
@@ -89,7 +100,6 @@ setIssue = function (targetId, title, targetIdOrigin) {
 	htmlModal += '<div class="mb-3">';
 	htmlModal += '<label for="issueTechnicalSolutionValue" class="mt-2 form-label">' + langVallydette.technical_solution + ' </label>';
 	htmlModal += '<textarea class="form-control" id="issueTechnicalSolutionValue"></textarea>';
-	htmlModal += '</div>';
 	htmlModal += '</div>';
 
 	htmlModal += '<div class="modal-footer">';
@@ -129,7 +139,7 @@ setIssue = function (targetId, title, targetIdOrigin) {
 		}
 
 		if(error==0){
-			addIssue(targetId, issueNameValue.value, issueDetailValue.value, issueSolutionValue.value, issueTechnicalSolutionValue.value);
+			addIssue(targetId, issueNameValue.value, issueUserImpactValue.value, issueDetailValue.value, issueSolutionValue.value, issueTechnicalSolutionValue.value);
 			document.getElementById('closeIssueBtnBtn').click();
 		}
 		
@@ -142,6 +152,7 @@ setIssue = function (targetId, title, targetIdOrigin) {
 			e.preventDefault();
 			
 			issueNameValue.value = issuesVallydette[targetIdOrigin][issuePredefined.value].title;
+			issueUserImpactValue.value = issuesVallydette[targetIdOrigin][issuePredefined.value].userImpact;
 			issueDetailValue.value = issuesVallydette[targetIdOrigin][issuePredefined.value].detail;
 			issueSolutionValue.value = issuesVallydette[targetIdOrigin][issuePredefined.value].solution;
 			issueTechnicalSolutionValue.value = issuesVallydette[targetIdOrigin][issuePredefined.value].technicalSolution;
@@ -166,12 +177,13 @@ setIssue = function (targetId, title, targetIdOrigin) {
  * @param {string} issueTitle.
  * @param {string} issueDetail.
 */
-addIssue = function (targetId, issueTitle, issueDetail, issueSolution, issueTechnicalSolution) {
+addIssue = function (targetId, issueTitle, issueUserImpact, issueDetail, issueSolution, issueTechnicalSolution) {
 	for (let i in dataVallydette.checklist.page[currentPage].items) {
 		if (dataVallydette.checklist.page[currentPage].items[i].ID === targetId) {
 			
 			newIssue = {};
 			newIssue['issueTitle'] = issueTitle;
+			newIssue['issueUserImpact'] = issueUserImpact;
 			newIssue['issueDetail'] = issueDetail;
 			newIssue['issueSolution'] = issueSolution;
 			newIssue['issueTechnicalSolution'] = issueTechnicalSolution;
@@ -247,6 +259,15 @@ editIssue = function (targetId, issueIndex) {
 	htmlEditIssue += '<label class="form-label" for="issueNameValue-' + issueIndex + '" id="issueNameValueLabel-' + issueIndex + '"> ' + langVallydette.summary + ' <span class="text-danger">*</span></label>';
 	htmlEditIssue += '<input type="text" class="form-control" id="issueNameValue-' + issueIndex + '" aria-labelledby="issueNameValueLabel-' + issueIndex + '" value="' + utils.escape_html(getIssue(targetId, 'issueTitle', issueIndex)) + '" required aria-invalid="false">';
 	htmlEditIssue += '<div id="issueNameValueError-' + issueIndex + '" class="alert alert-danger alert-sm d-none"><span class="alert-icon" aria-hidden="true"></span><p>' + langVallydette.summaryError + ' </p></div>';
+
+	htmlEditIssue += '<div class="mb-3">';
+	htmlEditIssue += '<select class="form-select" id="issueUserImpactValue-' + issueIndex + '" aria-label="' + langVallydette.select + '">';
+	htmlEditIssue += `<option value="${langVallydette.userImpact1}">${langVallydette.userImpact1}</option>`;
+	htmlEditIssue += `<option value="${langVallydette.userImpact2}">${langVallydette.userImpact2}</option>`;
+	htmlEditIssue += `<option value="${langVallydette.userImpact3}">${langVallydette.userImpact3}</option>`;
+	htmlEditIssue += '</select>';
+	htmlEditIssue += '</div>';
+
 	htmlEditIssue += '<label class="mt-2 form-label" for="issueDetailValue-' + issueIndex + '" id="issueDetailValueLabel-'+issueIndex+'">' + langVallydette.description + ' <span class="text-danger">*</span></label>';
 	htmlEditIssue += '<textarea class="form-control" id="issueDetailValue-' + issueIndex + '" aria-labelledby="issueDetailValueLabel-' + issueIndex + '" rows="8" required aria-invalid="false">' + utils.escape_html(getIssue(targetId, 'issueDetail', issueIndex)) + '</textarea>';
 	htmlEditIssue += '<div id="issueDetailValueError-' + issueIndex + '" class="alert alert-danger alert-sm d-none"><span class="alert-icon" aria-hidden="true"></span><p>' + langVallydette.descriptionError + ' </p></div>';
@@ -325,6 +346,7 @@ saveIssue = function (targetId, issueIndex, issueEditForm) {
 		if (dataVallydette.checklist.page[currentPage].items[i].ID === targetId) {
 
 			dataVallydette.checklist.page[currentPage].items[i].issues[issueIndex]['issueTitle'] = issueEditForm.elements["issueNameValue-" + issueIndex].value;
+			dataVallydette.checklist.page[currentPage].items[i].issues[issueIndex]['issueUserImpact'] = issueEditForm.elements["issueUserImpactValue-" + issueIndex].value;
 			dataVallydette.checklist.page[currentPage].items[i].issues[issueIndex]['issueDetail'] = issueEditForm.elements["issueDetailValue-" + issueIndex].value;
 			dataVallydette.checklist.page[currentPage].items[i].issues[issueIndex]['issueSolution'] = issueEditForm.elements["issueSolutionValue-" + issueIndex].value;
 			dataVallydette.checklist.page[currentPage].items[i].issues[issueIndex]['issueTechnicalSolution'] = issueEditForm.elements["issueTechnicalSolutionValue-" + issueIndex].value;
