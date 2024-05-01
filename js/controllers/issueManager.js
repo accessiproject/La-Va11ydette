@@ -352,13 +352,20 @@ const displayIssueBody = (targetId) => {
 					<div class="accordion-item" id="cardIssue${targetId}-${j}">
 						<div class="accordion-header" id="issue${targetId}-${j}">
 							<h2 class="mb-0">
-								<button id="btnIssue${targetId}-${j}" class="accordion-button collapsed w-100 m-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${targetId}-${j}" aria-expanded="false" aria-controls="#collapse${targetId}-${j}">#${auditNumber} ${utils.escape_html(dataVallydette.checklist.page[currentPage].items[i].issues[j].issueTitle)}</button>
+								<button id="btnIssue${targetId}-${j}" class="accordion-button collapsed w-100 m-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${targetId}-${j}" aria-expanded="false" aria-controls="#collapse${targetId}-${j}">
+									#${auditNumber} [${utils.escape_html(dataVallydette.checklist.page[currentPage].items[i].issues[j].issueUserImpact)}] ${utils.escape_html(dataVallydette.checklist.page[currentPage].items[i].issues[j].issueTitle)}
+								</button>
 							</h2>
 						</div>
 						<div id="collapse${targetId}-${j}" data-bs-parent="#issueList" class="accordion-collapse collapse" aria-labelledby="issue${targetId}-${j}">
 							<div class="accordion-body">
 								<div id="issue-body-${targetId}-${j}" class="px-3">
+									<h3 class="mb-0">${langVallydette.description}</h3>
 									${utils.escape_html(dataVallydette.checklist.page[currentPage].items[i].issues[j].issueDetail)}
+									<h3 class="mb-0">${langVallydette.solution}</h3>
+									${dataVallydette.checklist.page[currentPage].items[i].issues[j].issueSolution !== "" ? utils.escape_html(dataVallydette.checklist.page[currentPage].items[i].issues[j].issueSolution) : langVallydette.notSpecified}
+									<h3 class="mb-0">${langVallydette.technical_solution}</h3>
+									${dataVallydette.checklist.page[currentPage].items[i].issues[j].issueTechnicalSolution !== "" ? utils.escape_html(dataVallydette.checklist.page[currentPage].items[i].issues[j].issueTechnicalSolution) : langVallydette.notSpecified}
 								</div>
 								<button id="editIssueBtn-${targetId}-${j}" class="btn btn-secondary btn-sm" onClick="editIssue('${targetId}','${j}')">${langVallydette.edit}</button>
 								<button id="deleteIssueBtn-${targetId}-${j}" class="btn btn-secondary btn-sm" onClick="deleteConfirmationIssue('${targetId}','${j}')">${langVallydette.delete}</button>

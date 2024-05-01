@@ -104,6 +104,7 @@
 	"descriptionError": "The field description is required",
 	"solution": "solution",
 	"technical_solution": "technical solution",
+	"notSpecified": "not specified",
 	"priorityIssue" : "priority",
 	"reviewIssue": "review",
 	"stateIssue": "issue state / project team commentary",

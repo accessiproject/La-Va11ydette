@@ -104,6 +104,7 @@
 	"descriptionError": "Le champ description est obligatoire",
 	"solution": "solution",
 	"technical_solution": "solution technique",
+	"notSpecified": "non renseigné",
 	"priorityIssue" : "priorité",
 	"reviewIssue": "suivi validation",
 	"stateIssue": "état / remarque équipe projet",
