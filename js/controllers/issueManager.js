@@ -262,9 +262,9 @@ editIssue = function (targetId, issueIndex) {
 
 	htmlEditIssue += '<div class="mb-3">';
 	htmlEditIssue += '<select class="form-select" id="issueUserImpactValue-' + issueIndex + '" aria-label="' + langVallydette.select + '">';
-	htmlEditIssue += `<option value="${langVallydette.userImpact1}">${langVallydette.userImpact1}</option>`;
-	htmlEditIssue += `<option value="${langVallydette.userImpact2}">${langVallydette.userImpact2}</option>`;
-	htmlEditIssue += `<option value="${langVallydette.userImpact3}">${langVallydette.userImpact3}</option>`;
+	htmlEditIssue += `<option value="${langVallydette.userImpact1}" ${(utils.escape_html(getIssue(targetId, 'issueUserImpact', issueIndex)) === langVallydette.userImpact1) ? 'selected' : ''}>${langVallydette.userImpact1}</option>`;
+	htmlEditIssue += `<option value="${langVallydette.userImpact2}" ${(utils.escape_html(getIssue(targetId, 'issueUserImpact', issueIndex)) === langVallydette.userImpact2) ? 'selected' : ''}>${langVallydette.userImpact2}</option>`;
+	htmlEditIssue += `<option value="${langVallydette.userImpact3}" ${(utils.escape_html(getIssue(targetId, 'issueUserImpact', issueIndex)) === langVallydette.userImpact3) ? 'selected' : ''}>${langVallydette.userImpact3}</option>`;
 	htmlEditIssue += '</select>';
 	htmlEditIssue += '</div>';
 
@@ -405,11 +405,11 @@ displayIssueBody= function(targetId){
 				htmlModal += '<div class="accordion-item" id="cardIssue'+targetId+'-'+ j +'">';
 				
 				htmlModal += ' <div class="accordion-header" id="issue'+targetId+'-'+ j +'">';
-				htmlModal += ' <h5 class="mb-0">';
+				htmlModal += ' <h2 class="mb-0">';
 				htmlModal += ' <button id="btnIssue'+targetId+'-'+ j +'" class="accordion-button collapsed w-100 m-0" type="button" data-bs-toggle="collapse" data-bs-target="#collapse'+targetId+'-'+j+'" aria-expanded="false" aria-controls="#collapse'+targetId+'-'+j+'">';
 				htmlModal += '#' + auditNumber + ' ' + utils.escape_html(dataVallydette.checklist.page[currentPage].items[i].issues[j].issueTitle);
 				htmlModal += ' </button>';
-				htmlModal += '</h5>';
+				htmlModal += '</h2>';
 				htmlModal += ' </div>';
 
 				htmlModal += ' <div id="collapse'+ targetId +'-'+ j +'" data-bs-parent="#issueList" class="accordion-collapse collapse" aria-labelledby="issue'+targetId+'-'+ j +'" >';
