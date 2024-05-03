@@ -411,7 +411,7 @@ function runFinalComputationWcag(pagesResultsArray) {
 const runFinalComputationRGAA = (pagesResultsArray) => {
 
 	/**
-	 * 	Gets the number of non-tested items.
+	 * Gets the number of non-tested items.
 	 @param {number} nbNT - number of non-tested items.
 	*/
 	nbNTResultsArray = getNbNotTested();
@@ -442,11 +442,12 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 				<button class="nav-link" id="tabNonConformites" data-bs-toggle="tab" data-bs-target="#nonConformites" type="button" role="tab" aria-controls="nonConformites" aria-selected="false">${langVallydette.auditTxt5}</button>
 			</li>
 			<li class="nav-item" role="presentation">
-				<button class="nav-link" id="tabTest" data-bs-toggle="tab" data-bs-target="#test" type="button" role="tab" aria-controls="test" aria-selected="false">test</button>
+				<button class="nav-link" id="idTabTest" data-bs-toggle="tab" data-bs-target="#test" type="button" role="tab" aria-controls="test" aria-selected="false">test</button>
 			</li>
 		</ul>
 		<div class="tab-content border-0">
 		`;
+
 	computationContent += '<div class="tab-pane active" id="resultatPage" role="tabpanel" aria-labelledby="tabResultatPage">';
 	for (let i in pagesResultsArray) {
 		computationContent += '<h3>' + pagesResultsArray[i].name + ' : </h3>';
@@ -530,6 +531,39 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 
 	}
 	computationContent += '</div>'
+
+	/**
+	 * board of results
+	 **/
+	computationContent += '<div class="tab-pane" id="test" role="tabpanel" aria-labelledby="idTabTest">';
+	computationContent += '<div class="table-responsive">'
+	computationContent += '<table class="table table-striped"><caption class="visually-hidden">' + langVallydette.auditTxt4 + '</caption>';
+	computationContent += '<thead><tr>';
+	for (let i in pagesResultsArray) {
+	computationContent += `<th scope="row">${pagesResultsArray[i].name}</th>`;
+	}
+	computationContent += '</tr></thead>';
+	computationContent += '<tbody>';
+console.log("kevin");
+console.log(dataRGAA);
+	for (let i in pagesResultsArray) {
+
+		computationContent += '<tr>';
+		computationContent += '<th scope="row" class="font-weight-bold"> <span class="visually-hidden">Page : </span>' + pagesResultsArray[i].name + '</th>';
+		computationContent += '<td class="text-center">' + pagesResultsArray[i].totalconforme + '</td>';
+		computationContent += '<td class="text-center">' + pagesResultsArray[i].totalnonconforme + '</td>';
+		computationContent += '<td class="text-center">' + pagesResultsArray[i].totalnA + '</td>';
+		computationContent += '<td class="text-center bg-light">';
+		computationContent += (!isNaN(pagesResultsArray[i].result) && pagesResultsArray[i].result !== "NA") ? pagesResultsArray[i].result + ' % ' : '';
+		computationContent += (pagesResultsArray[i].complete === false) ? '(' + langVallydette.auditTxt6 + ')' : '';
+		computationContent += '</td>';
+		computationContent += '</tr>';
+
+	}
+	computationContent += '</tbody>';
+	computationContent += '</table>';
+	computationContent += ' </div>';
+	computationContent += ' </div>';
 
 
 	computationContent += '</div>'
