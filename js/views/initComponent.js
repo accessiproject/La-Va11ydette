@@ -537,28 +537,24 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 	 **/
 	computationContent += '<div class="tab-pane" id="test" role="tabpanel" aria-labelledby="idTabTest">';
 	computationContent += '<div class="table-responsive">'
-	computationContent += '<table class="table table-striped"><caption class="visually-hidden">' + langVallydette.auditTxt4 + '</caption>';
-	computationContent += '<thead><tr>';
+	computationContent += '<table class="table table-striped">';
+	computationContent += '<thead><tr><th scope="col">Thématique</th><th scope="col">Critère</th>';
 	for (let i in pagesResultsArray) {
-	computationContent += `<th scope="row">${pagesResultsArray[i].name}</th>`;
+	computationContent += `<th scope="col">${pagesResultsArray[i].name}</th>`;
 	}
-	computationContent += '</tr></thead>';
-	computationContent += '<tbody>';
-console.log("kevin");
-console.log(dataRGAA);
-	for (let i in pagesResultsArray) {
-
-		computationContent += '<tr>';
-		computationContent += '<th scope="row" class="font-weight-bold"> <span class="visually-hidden">Page : </span>' + pagesResultsArray[i].name + '</th>';
-		computationContent += '<td class="text-center">' + pagesResultsArray[i].totalconforme + '</td>';
-		computationContent += '<td class="text-center">' + pagesResultsArray[i].totalnonconforme + '</td>';
-		computationContent += '<td class="text-center">' + pagesResultsArray[i].totalnA + '</td>';
-		computationContent += '<td class="text-center bg-light">';
-		computationContent += (!isNaN(pagesResultsArray[i].result) && pagesResultsArray[i].result !== "NA") ? pagesResultsArray[i].result + ' % ' : '';
-		computationContent += (pagesResultsArray[i].complete === false) ? '(' + langVallydette.auditTxt6 + ')' : '';
-		computationContent += '</td>';
-		computationContent += '</tr>';
-
+	computationContent += '</tr></thead><tbody>';
+	console.log("paul");
+	console.log(pagesResultsArray);
+	for (let i=0;i<pagesResultsArray[0]["items"].length;i++) {
+		computationContent += `
+			<tr>
+				<td scope="row" class="font-weight-bold">${pagesResultsArray[0]["items"][i]["themes"]}</td>
+				<td scope="row" class="font-weight-bold">${pagesResultsArray[0]["items"][i]["name"]}</td>
+		`;
+		for (let j=0;j<pagesResultsArray.length;j++) {
+			computationContent += `<td class="font-weight-bold">${pagesResultsArray[j]["items"][i]["resultat"]}</td>`;
+		}
+		computationContent += `</tr>`;
 	}
 	computationContent += '</tbody>';
 	computationContent += '</table>';

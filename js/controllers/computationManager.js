@@ -67,6 +67,7 @@ function initComputationRGAA(){
 
 	dataVallydette.checklist.page[0].items.forEach(element =>{
 		testObj={};
+		testObj.themes = element.themes;
 		testObj.name = element.title;
 		testObj.comment = [];
 		testObj.page = [];
@@ -140,12 +141,13 @@ function runComputationRgaa(){
 		pagesResults[i].url = dataVallydette.checklist.page[i].url;
 
 
-
-
+console.log("kevin");
+console.log(dataRGAA);
+console.log("kevin");
 			for (let j in dataVallydette.checklist.page[i].items) {
 				pagesResults[i].items[j] = {};
-
 				pagesResults[i].items[j].complete = true;
+			pagesResults[i].items[j].themes = dataRGAA.items[j].themes
 				pagesResults[i].items[j].name = dataRGAA.items[j].name;
                 pagesResults[i].items[j].resultat = "nt";
 
@@ -573,5 +575,5 @@ function dataRGAAComputation() {
 	} else {
 		dataRGAA.result = ((dataRGAA.nbTrueRGAA / dataRGAA.nbTotalRGAA) * 100).toFixed(2);
 	}
-
 }
+
