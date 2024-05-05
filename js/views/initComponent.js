@@ -543,8 +543,6 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 	computationContent += `<th scope="col">${pagesResultsArray[i].name}</th>`;
 	}
 	computationContent += '</tr></thead><tbody>';
-	console.log("paul");
-	console.log(pagesResultsArray);
 	for (let i=0;i<pagesResultsArray[0]["items"].length;i++) {
 		computationContent += `
 			<tr>
@@ -560,7 +558,7 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 	computationContent += '</table>';
 	computationContent += ' </div>';
 	computationContent += ' </div>';
-
+showAllResultsRgaa();
 
 	computationContent += '</div>'
 

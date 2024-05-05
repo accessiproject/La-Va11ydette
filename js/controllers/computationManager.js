@@ -139,11 +139,6 @@ function runComputationRgaa(){
         pagesResults[i].items = [];
         pagesResults[i].name = dataVallydette.checklist.page[i].name;
 		pagesResults[i].url = dataVallydette.checklist.page[i].url;
-
-
-console.log("kevin");
-console.log(dataRGAA);
-console.log("kevin");
 			for (let j in dataVallydette.checklist.page[i].items) {
 				pagesResults[i].items[j] = {};
 				pagesResults[i].items[j].complete = true;
@@ -577,3 +572,127 @@ function dataRGAAComputation() {
 	}
 }
 
+/**
+ * @return {array} boardResults - Contains blabla
+*/
+function showAllResultsRgaa() {
+    var boardResults = [];
+    let nbGlobalConforme = 0;
+    let nbGlobalNonConforme = 0;
+    let nbGlobalNonApplicable = 0;
+    let nbMinor = 0;
+    let nbMajor = 0;
+    let nbBlocking = 0;
+    let compliancePages = [];
+    
+	
+	for (let i = 0; i < dataVallydette.checklist.page[0]["items"].length; i++) {
+        boardResults[i] = {};
+        boardResults[i]["themes"] = dataVallydette.checklist.page[0]["items"][i]["themes"];
+        boardResults[i]["ID"] = dataVallydette.checklist.page[0]["items"][i]["ID"];
+        boardResults[i]["IDorigin"] = dataVallydette.checklist.page[0]["items"][i]["IDorigin"];
+        boardResults[i]["title"] = dataVallydette.checklist.page[0]["items"][i]["title"];
+        boardResults[i]["goodPractice"] = dataVallydette.checklist.page[0]["items"][i]["goodPractice"];
+        boardResults[i]["verifier"] = dataVallydette.checklist.page[0]["items"][i]["verifier"];
+        boardResults[i]["wcag"] = dataVallydette.checklist.page[0]["items"][i]["wcag"];
+        boardResults[i]["pages"] = [];
+
+        for (let page in dataVallydette.checklist.page) {
+            boardResults[i]["pages"][page] = {};
+            if (!compliancePages[page]) {
+                compliancePages[page] = { conforme: 0, nonconforme: 0, na: 0, minor: 0, major: 0, blocking: 0 };
+            }
+            
+
+            for (let userImpact in dataVallydette.checklist.page[page]["items"][i]["issues"]) {
+                if (dataVallydette.checklist.page[page]["items"][i]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
+                    nbMinor++;
+					compliancePages[page]["minor"] += 1;
+                } else if (dataVallydette.checklist.page[page]["items"][i]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
+                    nbMajor++;
+					compliancePages[page]["major"] += 1;
+                } else {
+                    nbBlocking++;
+					compliancePages[page]["blocking"] += 1;
+                }
+            }
+            boardResults[i]["pages"][page]["issues"] = dataVallydette.checklist.page[page]["items"][i]["issues"];
+
+            if (dataVallydette.checklist.page[page]["items"][i]["resultatTest"] == "ko") {
+                boardResults[i]["pages"][page]["resultat"] = "Non conforme";
+                compliancePages[page]["nonconforme"] += 1;
+            } else if (dataVallydette.checklist.page[page]["items"][i]["resultatTest"] == "ok") {
+                boardResults[i]["pages"][page]["resultat"] = "Conforme";
+                compliancePages[page]["conforme"] += 1;
+            } else {
+                boardResults[i]["pages"][page]["resultat"] = "Non applicable";
+                compliancePages[page]["na"] += 1;
+            }
+
+            boardResults[i]["tracking_issues"] = [];
+            boardResults[i]["tracking_issues"]["minor"] = nbMinor;
+            boardResults[i]["tracking_issues"]["major"] = nbMajor;
+            boardResults[i]["tracking_issues"]["blocking"] = nbBlocking;
+            boardResults[i]["tracking_issues"]["total"] = nbMinor + nbMajor + nbBlocking;
+        }
+
+        boardResults[i]["resultat"] = {
+            nbconforme: compliancePages.reduce((acc, page) => acc + page["conforme"], 0),
+            nbnonconforme: compliancePages.reduce((acc, page) => acc + page["nonconforme"], 0),
+            nbnonapplicable: compliancePages.reduce((acc, page) => acc + page["na"], 0)
+        };
+
+        if (boardResults[i]["resultat"]["nbnonconforme"] > 0) {
+            boardResults[i]["resultat"]["globalResult"] = "Non conforme";
+            nbGlobalNonConforme++;
+        } else if (boardResults[i]["resultat"]["nbnonapplicable"] == boardResults[i]["pages"].length) {
+            boardResults[i]["resultat"]["globalResult"] = "Non applicable";
+            nbGlobalNonApplicable++;
+        } else {
+            boardResults[i]["resultat"]["globalResult"] = "Conforme";
+            nbGlobalConforme++;
+        }
+    }
+
+    console.log(nbGlobalConforme);
+    console.log(nbGlobalNonConforme);
+    console.log(nbGlobalNonApplicable);
+    console.log(compliancePages);
+
+    console.log(boardResults);
+	console.log(countIssuesByTheme(boardResults));
+}
+
+
+
+const countIssuesByTheme = (boardResults) => {
+    let themeCounts = {};
+
+    // Parcourir chaque résultat dans boardResults
+    boardResults.forEach(result => {
+        // Récupérer le thème du résultat
+        let theme = result.themes;
+
+        // S'assurer que le thème existe dans le comptage des problèmes
+        if (!themeCounts[theme]) {
+            themeCounts[theme] = {
+                minor: 0,
+                major: 0,
+                blocking: 0,
+                total: 0
+            };
+        }
+
+        // Ajouter les problèmes de chaque page associée au thème
+        result.pages.forEach(page => {
+            themeCounts[theme].minor += page.issues.filter(issue => issue.issueUserImpact === langVallydette.userImpact1).length;
+            themeCounts[theme].major += page.issues.filter(issue => issue.issueUserImpact === langVallydette.userImpact2).length;
+            themeCounts[theme].blocking += page.issues.filter(issue => issue.issueUserImpact !== langVallydette.userImpact1 && issue.issueUserImpact !== langVallydette.userImpact2).length;
+        });
+
+        // Calculer le total des problèmes pour ce thème
+        themeCounts[theme].total = themeCounts[theme].minor + themeCounts[theme].major + themeCounts[theme].blocking;
+    });
+
+    return themeCounts;
+}
