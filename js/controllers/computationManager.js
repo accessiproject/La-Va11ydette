@@ -637,9 +637,9 @@ const showAllResultsRgaa = () => {
 					nbCompliantCriteriaPerPage: 0,
 					nbNonCompliantCriteriaPerPage: 0,
 					nbNotApplicableCriteriaPerPage: 0,
-					minor: 0,
-					major: 0,
-					blocking: 0
+					nbMinorIssuesPerPage: 0,
+					nbMajorIssuesPerPage: 0,
+					nbBlockingIssuesPerPage: 0
 				};
 			}
 
@@ -647,13 +647,13 @@ const showAllResultsRgaa = () => {
 			for (let userImpact in dataPages[page]["items"][criteria]["issues"]) {
 				if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
 					nbMinor++;
-					complianceAuditResultsPerPage[page]["minor"] += 1;
+					complianceAuditResultsPerPage[page]["nbMinorIssuesPerPage"] += 1;
 				} else if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
 					nbMajor++;
-					complianceAuditResultsPerPage[page]["major"] += 1;
+					complianceAuditResultsPerPage[page]["nbMajorIssuesPerPage"] += 1;
 				} else {
 					nbBlocking++;
-					complianceAuditResultsPerPage[page]["blocking"] += 1;
+					complianceAuditResultsPerPage[page]["nbBlockingIssuesPerPage"] += 1;
 				}
 			}
 			complianceAuditResults[criteria]["pages"][page]["issues"] = dataPages[page]["items"][criteria]["issues"];
