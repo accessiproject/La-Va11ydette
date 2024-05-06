@@ -613,9 +613,9 @@ const showAllResultsRgaa = () => {
 	let nbGlobalConforme = 0;
 	let nbGlobalNonConforme = 0;
 	let nbGlobalNonApplicable = 0;
-	let nbMinor = 0;
-	let nbMajor = 0;
-	let nbBlocking = 0;
+	let countMinorIssuesPerCriterion = 0;
+	let countMajorIssuesPerCriterion = 0;
+	let countBlockingIssuesPerCriterion = 0;
 	let complianceAuditResultsPerPage = [];
 
 
@@ -643,37 +643,36 @@ const showAllResultsRgaa = () => {
 				};
 			}
 
-
 			for (let userImpact in dataPages[page]["items"][criteria]["issues"]) {
 				if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
-					nbMinor++;
+					countMinorIssuesPerCriterion;
 					complianceAuditResultsPerPage[page]["nbMinorIssuesPerPage"] += 1;
 				} else if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
-					nbMajor++;
+					countMajorIssuesPerCriterion++;
 					complianceAuditResultsPerPage[page]["nbMajorIssuesPerPage"] += 1;
 				} else {
-					nbBlocking++;
+					countBlockingIssuesPerCriterion++;
 					complianceAuditResultsPerPage[page]["nbBlockingIssuesPerPage"] += 1;
 				}
 			}
 			complianceAuditResults[criteria]["pages"][page]["issues"] = dataPages[page]["items"][criteria]["issues"];
 
 			if (dataPages[page]["items"][criteria]["resultatTest"] == "ko") {
-				complianceAuditResults[criteria]["pages"][page]["resultat"] = "Non conforme";
+				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status2;
 				complianceAuditResultsPerPage[page]["nbNonCompliantCriteriaPerPage"] += 1;
 			} else if (dataPages[page]["items"][criteria]["resultatTest"] == "ok") {
-				complianceAuditResults[criteria]["pages"][page]["resultat"] = "Conforme";
+				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status1;
 				complianceAuditResultsPerPage[page]["nbCompliantCriteriaPerPage"] += 1;
 			} else {
-				complianceAuditResults[criteria]["pages"][page]["resultat"] = "Non applicable";
+				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status3
 				complianceAuditResultsPerPage[page]["nbNotApplicableCriteriaPerPage"] += 1;
 			}
 
 			complianceAuditResults[criteria]["trackingIssues"] = [];
-			complianceAuditResults[criteria]["trackingIssues"]["minor"] = nbMinor;
-			complianceAuditResults[criteria]["trackingIssues"]["major"] = nbMajor;
-			complianceAuditResults[criteria]["trackingIssues"]["blocking"] = nbBlocking;
-			complianceAuditResults[criteria]["trackingIssues"]["total"] = nbMinor + nbMajor + nbBlocking;
+			complianceAuditResults[criteria]["trackingIssues"]["nbMinorIssuesPerCriterion"] = countMinorIssuesPerCriterion;
+			complianceAuditResults[criteria]["trackingIssues"]["nbMajorIssuesPerCriterion"] = countMajorIssuesPerCriterion;
+			complianceAuditResults[criteria]["trackingIssues"]["nbBlockingIssuesPerCriterion"] = countBlockingIssuesPerCriterion;
+			complianceAuditResults[criteria]["trackingIssues"]["nbTotalIssuesPerCriterion"] = countMinorIssuesPerCriterion + countMajorIssuesPerCriterion + countBlockingIssuesPerCriterion;
 		}
 
 		complianceAuditResults[criteria]["resultat"] = {
@@ -683,13 +682,13 @@ const showAllResultsRgaa = () => {
 		};
 
 		if (complianceAuditResults[criteria]["resultat"]["nbnonconforme"] > 0) {
-			complianceAuditResults[criteria]["resultat"]["globalResult"] = "Non conforme";
+			complianceAuditResults[criteria]["resultat"]["globalResult"] = langVallydette.template.status2;
 			nbGlobalNonConforme++;
 		} else if (complianceAuditResults[criteria]["resultat"]["nbnonapplicable"] == complianceAuditResults[criteria]["pages"].length) {
-			complianceAuditResults[criteria]["resultat"]["globalResult"] = "Non applicable";
+			complianceAuditResults[criteria]["resultat"]["globalResult"] = langVallydette.template.status3;
 			nbGlobalNonApplicable++;
 		} else {
-			complianceAuditResults[criteria]["resultat"]["globalResult"] = "Conforme";
+			complianceAuditResults[criteria]["resultat"]["globalResult"] = langVallydette.template.status1;
 			nbGlobalConforme++;
 		}
 	}
