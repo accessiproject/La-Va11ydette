@@ -22,32 +22,32 @@ initProperties = function (item) {
 function initComputationWcag() {
 
 	var matriceRequest = new XMLHttpRequest();
-    method = "GET",
-	matriceVallydette = 'json/wcag-' + globalLang+ '.json';
+	method = "GET",
+		matriceVallydette = 'json/wcag-' + globalLang + '.json';
 
 	matriceRequest.open(method, matriceVallydette, true);
 	matriceRequest.onreadystatechange = function () {
-	  if(matriceRequest.readyState === 4 && matriceRequest.status === 200) {
+		if (matriceRequest.readyState === 4 && matriceRequest.status === 200) {
 			dataWCAG = JSON.parse(matriceRequest.responseText);
 
 			dataWCAG.items.forEach(initRulesAndTests);
 
-            var btnShowResult = document.getElementById("btnShowResult");
-            btnShowResult.addEventListener('click', function () {
+			var btnShowResult = document.getElementById("btnShowResult");
+			btnShowResult.addEventListener('click', function () {
 				runComputationWcag();
 				utils.setPageTitle(langVallydette.auditResult);
 				utils.resetActive(document.getElementById("pageManager"));
 				utils.putTheFocus(document.getElementById("pageName"));
 				initAnchorMenu()
-            }, false);
+			}, false);
 
-	    runTestListMarkup(dataVallydette.checklist.page[currentPage].items);
-		if(window.location.hash !== ""){
-			document.getElementById(window.location.hash.substring(1)).scrollIntoView();
+			runTestListMarkup(dataVallydette.checklist.page[currentPage].items);
+			if (window.location.hash !== "") {
+				document.getElementById(window.location.hash.substring(1)).scrollIntoView();
+			}
+
+
 		}
-
-
-	  }
 	};
 	matriceRequest.send();
 
@@ -59,14 +59,14 @@ function initComputationWcag() {
  * Load data wcag
  *
 */
-function initComputationRGAA(){
+function initComputationRGAA() {
 
-	dataRGAA ={
-		items:[]
+	dataRGAA = {
+		items: []
 	}
 
-	dataVallydette.checklist.page[0].items.forEach(element =>{
-		testObj={};
+	dataVallydette.checklist.page[0].items.forEach(element => {
+		testObj = {};
 		testObj.themes = element.themes;
 		testObj.name = element.title;
 		testObj.comment = [];
@@ -78,23 +78,23 @@ function initComputationRGAA(){
 
 
 	var btnShowResult = document.getElementById("btnShowResult");
-            btnShowResult.addEventListener('click', function () {
-				runComputationRgaa();
-				utils.setPageTitle(langVallydette.auditResult);
-				utils.resetActive(document.getElementById("pageManager"));
-				utils.putTheFocus(document.getElementById("pageName"));
-				initAnchorMenu()
-				/*runComputationWcag();
-				utils.setPageTitle(langVallydette.auditResult);
-				utils.resetActive(document.getElementById("pageManager"));
-				utils.putTheFocus(document.getElementById("pageName"));
-				initAnchorMenu()
-				*/
-            }, false);
+	btnShowResult.addEventListener('click', function () {
+		runComputationRgaa();
+		utils.setPageTitle(langVallydette.auditResult);
+		utils.resetActive(document.getElementById("pageManager"));
+		utils.putTheFocus(document.getElementById("pageName"));
+		initAnchorMenu()
+		/*runComputationWcag();
+		utils.setPageTitle(langVallydette.auditResult);
+		utils.resetActive(document.getElementById("pageManager"));
+		utils.putTheFocus(document.getElementById("pageName"));
+		initAnchorMenu()
+		*/
+	}, false);
 	runTestListMarkup(dataVallydette.checklist.page[currentPage].items);
-		if(window.location.hash !== ""){
-			document.getElementById(window.location.hash.substring(1)).scrollIntoView();
-		}
+	if (window.location.hash !== "") {
+		document.getElementById(window.location.hash.substring(1)).scrollIntoView();
+	}
 
 }
 
@@ -102,16 +102,16 @@ function initComputationRGAA(){
  * Updates each wcag with necessary tests from the checklist
  * @param {object} rules - object that contains all the wcags
 */
-function initRulesAndTests (rules) {
-	 for (let i in dataVallydette.checklist.page[0].items) {
-		 for (let j in dataVallydette.checklist.page[0].items[i].wcag) {
+function initRulesAndTests(rules) {
+	for (let i in dataVallydette.checklist.page[0].items) {
+		for (let j in dataVallydette.checklist.page[0].items[i].wcag) {
 
 			var testWCAG = dataVallydette.checklist.page[0].items[i].wcag[j].split(" ");
 			if (testWCAG[0] === rules.wcag) {
 
 				rules.tests.push(dataVallydette.checklist.page[0].items[i].IDorigin);
 
-                rules.resultat = "nt";
+				rules.resultat = "nt";
 			}
 
 		}
@@ -125,73 +125,73 @@ function initRulesAndTests (rules) {
  * Pass through dataVallydette to build the pageResults array, which contains the Rgaa results for each pages.
  * @return {array} pagesResults - Contains all Rgaa results by pages.
 */
-function runComputationRgaa(){
+function runComputationRgaa() {
 
 	/**
 	* @param {array} pagesResults - Contains all wcag results by pages.
 	*/
-    pagesResults = [];
+	pagesResults = [];
 
 	dataRGAA.items.forEach(initProperties);
 
 	for (let i in dataVallydette.checklist.page) {
 		pagesResults[i] = [];
-        pagesResults[i].items = [];
-        pagesResults[i].name = dataVallydette.checklist.page[i].name;
+		pagesResults[i].items = [];
+		pagesResults[i].name = dataVallydette.checklist.page[i].name;
 		pagesResults[i].url = dataVallydette.checklist.page[i].url;
-			for (let j in dataVallydette.checklist.page[i].items) {
-				pagesResults[i].items[j] = {};
-				pagesResults[i].items[j].complete = true;
+		for (let j in dataVallydette.checklist.page[i].items) {
+			pagesResults[i].items[j] = {};
+			pagesResults[i].items[j].complete = true;
 			pagesResults[i].items[j].themes = dataRGAA.items[j].themes
-				pagesResults[i].items[j].name = dataRGAA.items[j].name;
-                pagesResults[i].items[j].resultat = "nt";
+			pagesResults[i].items[j].name = dataRGAA.items[j].name;
+			pagesResults[i].items[j].resultat = "nt";
 
-				testObj = {};
-				testObj.title = dataVallydette.checklist.page[i].items[j].title;
-				testObj.result = dataVallydette.checklist.page[i].items[j].resultatTest;
+			testObj = {};
+			testObj.title = dataVallydette.checklist.page[i].items[j].title;
+			testObj.result = dataVallydette.checklist.page[i].items[j].resultatTest;
 
-				if (dataVallydette.checklist.page[i].items[j].resultatTest === "nt") {
-					pagesResults[i].items[j].complete = false;
-				}
+			if (dataVallydette.checklist.page[i].items[j].resultatTest === "nt") {
+				pagesResults[i].items[j].complete = false;
+			}
 
-				if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
+			if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
 
-					dataRGAA.items[j].resultat = false;
-					if(dataVallydette.checklist.page[i].items[j].issues.length >0){
-						dataVallydette.checklist.page[i].items[j].issues.forEach(issue => {
-							dataRGAA.items[j].comment.push(issue.issueTitle);
-							dataRGAA.items[j].page.push(pagesResults[i].name);
-						});
-					}
-					}
-
-				if (pagesResults[i].items[j].resultat) {
-					if (dataVallydette.checklist.page[i].items[j].resultatTest === "ok") {
-
-						pagesResults[i].items[j].resultat = true;
-						if (dataRGAA.items[j].resultat !== false) {
-
-							dataRGAA.items[j].resultat = true;
-						}
-
-
-					} else if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
-						pagesResults[i].items[j].resultat = false;
-
-
-
-					} else if ((dataVallydette.checklist.page[i].items[j].resultatTest === "na") && (pagesResults[i].items[j].resultat === "nt")) {
-						pagesResults[i].items[j].resultat = "na";
-
-						if (dataRGAA.items[j].resultat !== false && dataRGAA.items[j].resultat !== true ) {
-							dataRGAA.items[j].resultat = "na";
-						}
-
-
-					}
-
+				dataRGAA.items[j].resultat = false;
+				if (dataVallydette.checklist.page[i].items[j].issues.length > 0) {
+					dataVallydette.checklist.page[i].items[j].issues.forEach(issue => {
+						dataRGAA.items[j].comment.push(issue.issueTitle);
+						dataRGAA.items[j].page.push(pagesResults[i].name);
+					});
 				}
 			}
+
+			if (pagesResults[i].items[j].resultat) {
+				if (dataVallydette.checklist.page[i].items[j].resultatTest === "ok") {
+
+					pagesResults[i].items[j].resultat = true;
+					if (dataRGAA.items[j].resultat !== false) {
+
+						dataRGAA.items[j].resultat = true;
+					}
+
+
+				} else if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
+					pagesResults[i].items[j].resultat = false;
+
+
+
+				} else if ((dataVallydette.checklist.page[i].items[j].resultatTest === "na") && (pagesResults[i].items[j].resultat === "nt")) {
+					pagesResults[i].items[j].resultat = "na";
+
+					if (dataRGAA.items[j].resultat !== false && dataRGAA.items[j].resultat !== true) {
+						dataRGAA.items[j].resultat = "na";
+					}
+
+
+				}
+
+			}
+		}
 	}
 
 	pagesResults = pagesResultsComputationRGAA(pagesResults);
@@ -214,109 +214,109 @@ function runComputationWcag(obj) {
 	/**
 	* @param {array} pagesResults - Contains all wcag results by pages.
 	*/
-    pagesResults = [];
-	countNocomplete=0;
+	pagesResults = [];
+	countNocomplete = 0;
 
 	/**
 	* Initilization of the dataWCAG results, to be sure that the results are correctly re-computed each time the audit results are displayed.
 	*/
 	dataWCAG.items.forEach(initProperties);
 
-    for (let i in dataVallydette.checklist.page) {
-        pagesResults[i] = [];
-        pagesResults[i].items = [];
-        pagesResults[i].name = dataVallydette.checklist.page[i].name;
+	for (let i in dataVallydette.checklist.page) {
+		pagesResults[i] = [];
+		pagesResults[i].items = [];
+		pagesResults[i].name = dataVallydette.checklist.page[i].name;
 		pagesResults[i].url = dataVallydette.checklist.page[i].url;
 
-        for (let k in dataWCAG.items) {
+		for (let k in dataWCAG.items) {
 
-				pagesResults[i].items[k] = {};
-				pagesResults[i].items[k].wcag = dataWCAG.items[k].wcag;
-				pagesResults[i].items[k].level = dataWCAG.items[k].level;
+			pagesResults[i].items[k] = {};
+			pagesResults[i].items[k].wcag = dataWCAG.items[k].wcag;
+			pagesResults[i].items[k].level = dataWCAG.items[k].level;
 
-				if (dataWCAG.items[k].tests.length > 0) {
-					pagesResults[i].items[k].resultat = "nt";
-				} else {
-					pagesResults[i].items[k].resultat = "na";
-				}
+			if (dataWCAG.items[k].tests.length > 0) {
+				pagesResults[i].items[k].resultat = "nt";
+			} else {
+				pagesResults[i].items[k].resultat = "na";
+			}
 
-				pagesResults[i].items[k].complete = true;
-				if(!countNocomplete){
-					dataWCAG.items[k].complete = true;
-				}
+			pagesResults[i].items[k].complete = true;
+			if (!countNocomplete) {
+				dataWCAG.items[k].complete = true;
+			}
 
-				pagesResults[i].items[k].test = [];
-				pagesResults[i].items[k].name = dataWCAG.items[k].name;
+			pagesResults[i].items[k].test = [];
+			pagesResults[i].items[k].name = dataWCAG.items[k].name;
 
+			/**
+			* Pass through each test of a wcag.
+			*/
+			for (let l in dataWCAG.items[k].tests) {
 				/**
-				* Pass through each test of a wcag.
+				* Gets each test value, and updates the current wcag rules, basing on computation rules.
 				*/
-				for (let l in dataWCAG.items[k].tests) {
-					/**
-					* Gets each test value, and updates the current wcag rules, basing on computation rules.
-					*/
 
-					for (let j in dataVallydette.checklist.page[i].items) {
+				for (let j in dataVallydette.checklist.page[i].items) {
 
-						if (dataWCAG.items[k].tests[l] === dataVallydette.checklist.page[i].items[j].IDorigin) {
+					if (dataWCAG.items[k].tests[l] === dataVallydette.checklist.page[i].items[j].IDorigin) {
 
-							testObj = {};
-							testObj.title = dataVallydette.checklist.page[i].items[j].title;
-							testObj.result = dataVallydette.checklist.page[i].items[j].resultatTest;
-							pagesResults[i].items[k].test.push(testObj);
+						testObj = {};
+						testObj.title = dataVallydette.checklist.page[i].items[j].title;
+						testObj.result = dataVallydette.checklist.page[i].items[j].resultatTest;
+						pagesResults[i].items[k].test.push(testObj);
 
 
-							if (dataVallydette.checklist.page[i].items[j].resultatTest === "nt" && dataVallydette.checklist.page[i].items[j].goodPractice === false) {
-								pagesResults[i].items[k].complete = false;
-								dataWCAG.items[k].complete = false;
-								countNocomplete++;
+						if (dataVallydette.checklist.page[i].items[j].resultatTest === "nt" && dataVallydette.checklist.page[i].items[j].goodPractice === false) {
+							pagesResults[i].items[k].complete = false;
+							dataWCAG.items[k].complete = false;
+							countNocomplete++;
+						}
+
+						if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
+
+							dataWCAG.items[k].resultat = false;
+							if (dataVallydette.checklist.page[i].items[j].issues.length > 0) {
+								dataVallydette.checklist.page[i].items[j].issues.forEach(issue => {
+									dataWCAG.items[k].comment.push(issue.issueTitle);
+									dataWCAG.items[k].page.push(pagesResults[i].name);
+								});
 							}
+						}
 
-							if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
+						if (pagesResults[i].items[k].resultat) {
 
-								dataWCAG.items[k].resultat = false;
-								if(dataVallydette.checklist.page[i].items[j].issues.length >0){
-									dataVallydette.checklist.page[i].items[j].issues.forEach(issue => {
-										dataWCAG.items[k].comment.push(issue.issueTitle);
-										dataWCAG.items[k].page.push(pagesResults[i].name);
-									});
-								}
-							 }
+							if (dataVallydette.checklist.page[i].items[j].resultatTest === "ok") {
+								pagesResults[i].items[k].resultat = true;
 
-							if (pagesResults[i].items[k].resultat) {
+								if (dataWCAG.items[k].resultat !== false) {
 
-								if (dataVallydette.checklist.page[i].items[j].resultatTest === "ok") {
-									pagesResults[i].items[k].resultat = true;
-
-									if (dataWCAG.items[k].resultat !== false) {
-
-										dataWCAG.items[k].resultat = true;
-									}
-
-									break;
-
-								} else if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
-									pagesResults[i].items[k].resultat = false;
-									break;
-
-
-								} else if ((dataVallydette.checklist.page[i].items[j].resultatTest === "na") && (pagesResults[i].items[k].resultat === "nt")) {
-                                    pagesResults[i].items[k].resultat = "na";
-
-									if (dataWCAG.items[k].resultat !== false && dataWCAG.items[k].resultat !== true ) {
-										dataWCAG.items[k].resultat = "na";
-									}
-
-									break;
+									dataWCAG.items[k].resultat = true;
 								}
 
+								break;
+
+							} else if (dataVallydette.checklist.page[i].items[j].resultatTest === "ko") {
+								pagesResults[i].items[k].resultat = false;
+								break;
+
+
+							} else if ((dataVallydette.checklist.page[i].items[j].resultatTest === "na") && (pagesResults[i].items[k].resultat === "nt")) {
+								pagesResults[i].items[k].resultat = "na";
+
+								if (dataWCAG.items[k].resultat !== false && dataWCAG.items[k].resultat !== true) {
+									dataWCAG.items[k].resultat = "na";
+								}
+
+								break;
 							}
+
 						}
 					}
 				}
+			}
 
-        }
-    }
+		}
+	}
 	pagesResults = pagesResultsComputationWcag(pagesResults);
 	dataWCAGComputation();
 
@@ -330,21 +330,21 @@ function runComputationWcag(obj) {
 
 }
 
-   /**
- * Run all the computation per pages, from the results collected into pagesResults array
- * @param {array} pagesResultsArray - Contains all wcag results by pages.
- * @return {array} pagesResultsArray - Contains all wcag results by pages, and the diffrents results
+/**
+* Run all the computation per pages, from the results collected into pagesResults array
+* @param {array} pagesResultsArray - Contains all wcag results by pages.
+* @return {array} pagesResultsArray - Contains all wcag results by pages, and the diffrents results
 */
 function pagesResultsComputationWcag(pagesResultsArray) {
 	var finalTotal = 0;
-    var finalResult = 0;
-    var nbPage = 0;
+	var finalResult = 0;
+	var nbPage = 0;
 
 	for (let i in pagesResultsArray) {
-        var nbTrue = 0;
-        var nbFalse = 0;
-        var nbNA = 0;
-        var nbTotal = 0;
+		var nbTrue = 0;
+		var nbFalse = 0;
+		var nbNA = 0;
+		var nbTotal = 0;
 		var nbTrueA = 0;
 		var nbFalseA = 0;
 		var nbNaA = 0;
@@ -361,9 +361,9 @@ function pagesResultsComputationWcag(pagesResultsArray) {
 		var indexItem = 0;
 		for (let j in pagesResultsArray[i].items) {
 			if (pagesResultsArray[i].items[indexItem].level === 'AAA') {
-				pagesResultsArray[i].items.splice(indexItem,1);
+				pagesResultsArray[i].items.splice(indexItem, 1);
 			} else {
-				indexItem = indexItem+1;
+				indexItem = indexItem + 1;
 			}
 		}
 
@@ -388,7 +388,7 @@ function pagesResultsComputationWcag(pagesResultsArray) {
 			} else if (pagesResultsArray[i].items[j].resultat === 'na') {
 				nbNA++;
 
-				pagesResultsArray[i].items[j].level === 'A' ? nbNaA++ :nbNaAA++;
+				pagesResultsArray[i].items[j].level === 'A' ? nbNaA++ : nbNaAA++;
 				pagesResultsArray[i].items[j].level === 'A' ? nbTotalA++ : nbTotalAA++;
 			}
 			if (pagesResultsArray[i].items[j].complete === false) {
@@ -399,7 +399,7 @@ function pagesResultsComputationWcag(pagesResultsArray) {
 		/**
 		 * 	If all the tests of a page are non-applicables (hypothetical but tested)
 		*/
-		if (nbTotal===0 && nbNA>0) {
+		if (nbTotal === 0 && nbNA > 0) {
 			pagesResultsArray[i].result = "NA";
 		} else {
 			pagesResultsArray[i].result = Math.round((nbTrue / nbTotal) * 100);
@@ -418,34 +418,34 @@ function pagesResultsComputationWcag(pagesResultsArray) {
 	}
 
 	/** Final global pages result computation. */
-    for (let i in pagesResultsArray) {
-        if (pagesResultsArray[i].result != "NA") {
-            finalTotal = finalTotal + pagesResultsArray[i].result;
-            nbPage = nbPage + 1;
-        }
-    }
+	for (let i in pagesResultsArray) {
+		if (pagesResultsArray[i].result != "NA") {
+			finalTotal = finalTotal + pagesResultsArray[i].result;
+			nbPage = nbPage + 1;
+		}
+	}
 
 	/** Final conformity rate. */
-    finalResult = Math.round((finalTotal / nbPage));
+	finalResult = Math.round((finalTotal / nbPage));
 	dataWCAG.globalPagesResult = finalResult;
 
 	return pagesResultsArray;
 }
 
-   /**
- * Run all the computation per pages, from the results collected into pagesResults array
- * @param {array} pagesResultsArray - Contains all rgaa results by pages.
- * @return {array} pagesResultsArray - Contains all rgaa results by pages, and the diffrents results
+/**
+* Run all the computation per pages, from the results collected into pagesResults array
+* @param {array} pagesResultsArray - Contains all rgaa results by pages.
+* @return {array} pagesResultsArray - Contains all rgaa results by pages, and the diffrents results
 */
 function pagesResultsComputationRGAA(pagesResultsArray) {
 	var finalTotal = 0;
-    var finalResult = 0;
-    var nbPage = 0;
+	var finalResult = 0;
+	var nbPage = 0;
 	for (let i in pagesResultsArray) {
-        var nbTrue = 0;
-        var nbFalse = 0;
-        var nbNA = 0;
-        var nbTotal = 0;
+		var nbTrue = 0;
+		var nbFalse = 0;
+		var nbNA = 0;
+		var nbTotal = 0;
 
 		/**
 		 * 	Gets the number of true, false, non-applicable and non-tested by pages.
@@ -470,7 +470,7 @@ function pagesResultsComputationRGAA(pagesResultsArray) {
 		/**
 		 * 	If all the tests of a page are non-applicables (hypothetical but tested)
 		*/
-		if (nbTotal===0 && nbNA>0) {
+		if (nbTotal === 0 && nbNA > 0) {
 			pagesResultsArray[i].result = "NA";
 		} else {
 			pagesResultsArray[i].result = ((nbTrue / nbTotal) * 100).toFixed(2);
@@ -483,16 +483,16 @@ function pagesResultsComputationRGAA(pagesResultsArray) {
 	}
 
 	/** Final global pages result computation. */
-    for (let i in pagesResultsArray) {
-        if (pagesResultsArray[i].result != "NA") {
-            finalTotal = (finalTotal + parseFloat(pagesResultsArray[i].result));
-            nbPage = nbPage + 1;
-        }
-    }
+	for (let i in pagesResultsArray) {
+		if (pagesResultsArray[i].result != "NA") {
+			finalTotal = (finalTotal + parseFloat(pagesResultsArray[i].result));
+			nbPage = nbPage + 1;
+		}
+	}
 
 	/** Final conformity rate. */
 
-    finalResult = (finalTotal / nbPage).toFixed(2);
+	finalResult = (finalTotal / nbPage).toFixed(2);
 	dataRGAA.globalPagesResult = finalResult;
 
 	return pagesResultsArray;
@@ -510,41 +510,73 @@ function dataWCAGComputation() {
 	 * 	Check if all critere are completed.
 	*/
 
-		for (let i in dataWCAG.items) {
-			if ((dataWCAG.items[i].level!=="AAA") && ((dataWCAG.items[i].resultat === 'nt' && dataWCAG.items[i].deprecated !== true) || dataWCAG.items[i].complete ===false)) {
-                dataWCAG.complete = false;
-			}
+	for (let i in dataWCAG.items) {
+		if ((dataWCAG.items[i].level !== "AAA") && ((dataWCAG.items[i].resultat === 'nt' && dataWCAG.items[i].deprecated !== true) || dataWCAG.items[i].complete === false)) {
+			dataWCAG.complete = false;
+		}
+	}
+
+	/** Adds the results to the WCAG object. */
+	dataWCAG.conformeA = dataWCAG.items.filter(item => item.level === "A" && item.resultat === true).length;
+	dataWCAG.conformeAA = dataWCAG.items.filter(item => item.level === "AA" && item.resultat === true).length;
+	dataWCAG.nonconformeA = dataWCAG.items.filter(item => item.level === "A" && item.resultat === false).length;
+	dataWCAG.nonconformeAA = dataWCAG.items.filter(item => item.level === "AA" && item.resultat === false).length;
+	dataWCAG.naA = dataWCAG.items.filter(item => item.level === "A" && item.resultat === "na").length;
+	dataWCAG.naAA = dataWCAG.items.filter(item => item.level === "AA" && item.resultat === "na").length;
+	dataWCAG.totalconforme = dataWCAG.conformeA + dataWCAG.conformeAA;
+	dataWCAG.totalnonconforme = dataWCAG.nonconformeA + dataWCAG.nonconformeAA;
+
+	dataWCAG.totalA = dataWCAG.items.filter(function (item) { return item.level === "A" }).length;
+	dataWCAG.totalAA = dataWCAG.items.filter(function (item) { return item.level === "AA" }).length;
+
+	dataWCAG.nbTotalWcag = dataWCAG.items.filter(item => (item.resultat === true || item.resultat === false) && item.level !== "AAA").length;
+	dataWCAG.nbTrueWcag = dataWCAG.items.filter(item => item.resultat === true && item.level !== "AAA").length;
+	dataWCAG.nbFalseWcag = dataWCAG.items.filter(item => item.resultat === false && item.level !== "AAA").length;
+	dataWCAG.nbNaWcag = dataWCAG.items.filter(item => item.resultat === "na" && item.level !== "AAA").length;
+
+	/**
+	* 	If all the wcag are non-applicables (hypothetical but tested)
+	*/
+	if (dataWCAG.nbTotalWcag === 0 && dataWCAG.nbNaWcag > 0) {
+		dataWCAG.result = "NA";
+	} else {
+		dataWCAG.result = Math.round((dataWCAG.nbTrueWcag / dataWCAG.nbTotalWcag) * 100);
+		dataWCAG.resultA = Math.round((dataWCAG.conformeA / (dataWCAG.conformeA + dataWCAG.nonconformeA)) * 100);
+		dataWCAG.resultAA = Math.round((dataWCAG.conformeAA / (dataWCAG.conformeAA + dataWCAG.nonconformeAA)) * 100);
+	}
+
+}
+
+const countIssuesByTheme = (boardResults) => {
+	let themeCounts = {};
+
+	// Parcourir chaque résultat dans boardResults
+	boardResults.forEach(result => {
+		// Récupérer le thème du résultat
+		let theme = result.themes;
+
+		// S'assurer que le thème existe dans le comptage des problèmes
+		if (!themeCounts[theme]) {
+			themeCounts[theme] = {
+				minor: 0,
+				major: 0,
+				blocking: 0,
+				total: 0
+			};
 		}
 
-		/** Adds the results to the WCAG object. */
-		dataWCAG.conformeA = dataWCAG.items.filter(item => item.level ==="A" && item.resultat === true).length;
-		dataWCAG.conformeAA = dataWCAG.items.filter(item => item.level ==="AA" && item.resultat === true).length;
-		dataWCAG.nonconformeA = dataWCAG.items.filter(item => item.level ==="A" && item.resultat === false).length;
-		dataWCAG.nonconformeAA = dataWCAG.items.filter(item => item.level ==="AA" && item.resultat === false).length;
-		dataWCAG.naA = dataWCAG.items.filter(item => item.level ==="A" && item.resultat === "na").length;
-		dataWCAG.naAA = dataWCAG.items.filter(item => item.level ==="AA" && item.resultat === "na").length;
-		dataWCAG.totalconforme = dataWCAG.conformeA + dataWCAG.conformeAA;
-		dataWCAG.totalnonconforme = dataWCAG.nonconformeA + dataWCAG.nonconformeAA;
+		// Ajouter les problèmes de chaque page associée au thème
+		result.pages.forEach(page => {
+			themeCounts[theme].minor += page.issues.filter(issue => issue.issueUserImpact === langVallydette.userImpact1).length;
+			themeCounts[theme].major += page.issues.filter(issue => issue.issueUserImpact === langVallydette.userImpact2).length;
+			themeCounts[theme].blocking += page.issues.filter(issue => issue.issueUserImpact !== langVallydette.userImpact1 && issue.issueUserImpact !== langVallydette.userImpact2).length;
+		});
 
-		dataWCAG.totalA = dataWCAG.items.filter(function(item){return item.level==="A"}).length;
-		dataWCAG.totalAA = dataWCAG.items.filter(function(item){return item.level==="AA"}).length;
+		// Calculer le total des problèmes pour ce thème
+		themeCounts[theme].total = themeCounts[theme].minor + themeCounts[theme].major + themeCounts[theme].blocking;
+	});
 
-		dataWCAG.nbTotalWcag = dataWCAG.items.filter(item => (item.resultat === true || item.resultat === false) && item.level!=="AAA").length;
-		dataWCAG.nbTrueWcag = dataWCAG.items.filter(item => item.resultat === true && item.level!=="AAA").length;
-		dataWCAG.nbFalseWcag = dataWCAG.items.filter(item => item.resultat === false && item.level!=="AAA").length;
-		dataWCAG.nbNaWcag = dataWCAG.items.filter(item => item.resultat === "na" && item.level!=="AAA").length;
-
-		/**
-		* 	If all the wcag are non-applicables (hypothetical but tested)
-		*/
-		if (dataWCAG.nbTotalWcag===0 && dataWCAG.nbNaWcag>0) {
-			dataWCAG.result = "NA";
-		} else {
-			dataWCAG.result = Math.round((dataWCAG.nbTrueWcag / dataWCAG.nbTotalWcag) * 100);
-			dataWCAG.resultA = Math.round((dataWCAG.conformeA / (dataWCAG.conformeA+dataWCAG.nonconformeA)) * 100);
-			dataWCAG.resultAA = Math.round((dataWCAG.conformeAA / (dataWCAG.conformeAA+dataWCAG.nonconformeAA)) * 100);
-		}
-
+	return themeCounts;
 }
 
 /**
@@ -557,7 +589,7 @@ function dataRGAAComputation() {
 	dataRGAA.complete = true;
 
 
-	dataRGAA.nbTotalRGAA = dataRGAA.items.filter(item => (item.resultat === true || item.resultat === false) && item.level!=="AAA").length;
+	dataRGAA.nbTotalRGAA = dataRGAA.items.filter(item => (item.resultat === true || item.resultat === false) && item.level !== "AAA").length;
 	dataRGAA.nbTrueRGAA = dataRGAA.items.filter(item => item.resultat === true).length;
 	dataRGAA.nbFalseRGAA = dataRGAA.items.filter(item => item.resultat === false).length;
 	dataRGAA.nbNaRGAA = dataRGAA.items.filter(item => item.resultat === "na").length;
@@ -565,7 +597,7 @@ function dataRGAAComputation() {
 	/**
 	* 	If all the wcag are non-applicables (hypothetical but tested)
 	*/
-	if (dataRGAA.nbTotalWcag===0 && dataRGAA.nbNaWcag>0) {
+	if (dataRGAA.nbTotalWcag === 0 && dataRGAA.nbNaWcag > 0) {
 		dataRGAA.result = "NA";
 	} else {
 		dataRGAA.result = ((dataRGAA.nbTrueRGAA / dataRGAA.nbTotalRGAA) * 100).toFixed(2);
@@ -575,124 +607,91 @@ function dataRGAAComputation() {
 /**
  * @return {array} boardResults - Contains blabla
 */
-function showAllResultsRgaa() {
-    var boardResults = [];
-    let nbGlobalConforme = 0;
-    let nbGlobalNonConforme = 0;
-    let nbGlobalNonApplicable = 0;
-    let nbMinor = 0;
-    let nbMajor = 0;
-    let nbBlocking = 0;
-    let compliancePages = [];
-    
-	
-	for (let i = 0; i < dataVallydette.checklist.page[0]["items"].length; i++) {
-        boardResults[i] = {};
-        boardResults[i]["themes"] = dataVallydette.checklist.page[0]["items"][i]["themes"];
-        boardResults[i]["ID"] = dataVallydette.checklist.page[0]["items"][i]["ID"];
-        boardResults[i]["IDorigin"] = dataVallydette.checklist.page[0]["items"][i]["IDorigin"];
-        boardResults[i]["title"] = dataVallydette.checklist.page[0]["items"][i]["title"];
-        boardResults[i]["goodPractice"] = dataVallydette.checklist.page[0]["items"][i]["goodPractice"];
-        boardResults[i]["verifier"] = dataVallydette.checklist.page[0]["items"][i]["verifier"];
-        boardResults[i]["wcag"] = dataVallydette.checklist.page[0]["items"][i]["wcag"];
-        boardResults[i]["pages"] = [];
+const showAllResultsRgaa = () => {
+	let dataPages = dataVallydette.checklist.page;
+	let boardResults = [];
+	let nbGlobalConforme = 0;
+	let nbGlobalNonConforme = 0;
+	let nbGlobalNonApplicable = 0;
+	let nbMinor = 0;
+	let nbMajor = 0;
+	let nbBlocking = 0;
+	let compliancePages = [];
 
-        for (let page in dataVallydette.checklist.page) {
-            boardResults[i]["pages"][page] = {};
-            if (!compliancePages[page]) {
-                compliancePages[page] = { conforme: 0, nonconforme: 0, na: 0, minor: 0, major: 0, blocking: 0 };
-            }
-            
 
-            for (let userImpact in dataVallydette.checklist.page[page]["items"][i]["issues"]) {
-                if (dataVallydette.checklist.page[page]["items"][i]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
-                    nbMinor++;
+	for (let criteria = 0; criteria < dataPages[0]["items"].length; criteria++) {
+		boardResults[criteria] = {};
+		boardResults[criteria]["themes"] = dataPages[0]["items"][criteria]["themes"];
+		boardResults[criteria]["ID"] = dataPages[0]["items"][criteria]["ID"];
+		boardResults[criteria]["IDorigin"] = dataPages[0]["items"][criteria]["IDorigin"];
+		boardResults[criteria]["title"] = dataPages[0]["items"][criteria]["title"];
+		boardResults[criteria]["goodPractice"] = dataPages[0]["items"][criteria]["goodPractice"];
+		boardResults[criteria]["verifier"] = dataPages[0]["items"][criteria]["verifier"];
+		boardResults[criteria]["wcag"] = dataPages[0]["items"][criteria]["wcag"];
+		boardResults[criteria]["pages"] = [];
+
+		for (let page in dataPages) {
+			boardResults[criteria]["pages"][page] = {};
+			if (!compliancePages[page]) {
+				compliancePages[page] = { conforme: 0, nonconforme: 0, na: 0, minor: 0, major: 0, blocking: 0 };
+			}
+
+
+			for (let userImpact in dataPages[page]["items"][criteria]["issues"]) {
+				if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
+					nbMinor++;
 					compliancePages[page]["minor"] += 1;
-                } else if (dataVallydette.checklist.page[page]["items"][i]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
-                    nbMajor++;
+				} else if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
+					nbMajor++;
 					compliancePages[page]["major"] += 1;
-                } else {
-                    nbBlocking++;
+				} else {
+					nbBlocking++;
 					compliancePages[page]["blocking"] += 1;
-                }
-            }
-            boardResults[i]["pages"][page]["issues"] = dataVallydette.checklist.page[page]["items"][i]["issues"];
+				}
+			}
+			boardResults[criteria]["pages"][page]["issues"] = dataPages[page]["items"][criteria]["issues"];
 
-            if (dataVallydette.checklist.page[page]["items"][i]["resultatTest"] == "ko") {
-                boardResults[i]["pages"][page]["resultat"] = "Non conforme";
-                compliancePages[page]["nonconforme"] += 1;
-            } else if (dataVallydette.checklist.page[page]["items"][i]["resultatTest"] == "ok") {
-                boardResults[i]["pages"][page]["resultat"] = "Conforme";
-                compliancePages[page]["conforme"] += 1;
-            } else {
-                boardResults[i]["pages"][page]["resultat"] = "Non applicable";
-                compliancePages[page]["na"] += 1;
-            }
+			if (dataPages[page]["items"][criteria]["resultatTest"] == "ko") {
+				boardResults[criteria]["pages"][page]["resultat"] = "Non conforme";
+				compliancePages[page]["nonconforme"] += 1;
+			} else if (dataPages[page]["items"][criteria]["resultatTest"] == "ok") {
+				boardResults[criteria]["pages"][page]["resultat"] = "Conforme";
+				compliancePages[page]["conforme"] += 1;
+			} else {
+				boardResults[criteria]["pages"][page]["resultat"] = "Non applicable";
+				compliancePages[page]["na"] += 1;
+			}
 
-            boardResults[i]["tracking_issues"] = [];
-            boardResults[i]["tracking_issues"]["minor"] = nbMinor;
-            boardResults[i]["tracking_issues"]["major"] = nbMajor;
-            boardResults[i]["tracking_issues"]["blocking"] = nbBlocking;
-            boardResults[i]["tracking_issues"]["total"] = nbMinor + nbMajor + nbBlocking;
-        }
+			boardResults[criteria]["tracking_issues"] = [];
+			boardResults[criteria]["tracking_issues"]["minor"] = nbMinor;
+			boardResults[criteria]["tracking_issues"]["major"] = nbMajor;
+			boardResults[criteria]["tracking_issues"]["blocking"] = nbBlocking;
+			boardResults[criteria]["tracking_issues"]["total"] = nbMinor + nbMajor + nbBlocking;
+		}
 
-        boardResults[i]["resultat"] = {
-            nbconforme: compliancePages.reduce((acc, page) => acc + page["conforme"], 0),
-            nbnonconforme: compliancePages.reduce((acc, page) => acc + page["nonconforme"], 0),
-            nbnonapplicable: compliancePages.reduce((acc, page) => acc + page["na"], 0)
-        };
+		boardResults[criteria]["resultat"] = {
+			nbconforme: compliancePages.reduce((acc, page) => acc + page["conforme"], 0),
+			nbnonconforme: compliancePages.reduce((acc, page) => acc + page["nonconforme"], 0),
+			nbnonapplicable: compliancePages.reduce((acc, page) => acc + page["na"], 0)
+		};
 
-        if (boardResults[i]["resultat"]["nbnonconforme"] > 0) {
-            boardResults[i]["resultat"]["globalResult"] = "Non conforme";
-            nbGlobalNonConforme++;
-        } else if (boardResults[i]["resultat"]["nbnonapplicable"] == boardResults[i]["pages"].length) {
-            boardResults[i]["resultat"]["globalResult"] = "Non applicable";
-            nbGlobalNonApplicable++;
-        } else {
-            boardResults[i]["resultat"]["globalResult"] = "Conforme";
-            nbGlobalConforme++;
-        }
-    }
+		if (boardResults[criteria]["resultat"]["nbnonconforme"] > 0) {
+			boardResults[criteria]["resultat"]["globalResult"] = "Non conforme";
+			nbGlobalNonConforme++;
+		} else if (boardResults[criteria]["resultat"]["nbnonapplicable"] == boardResults[criteria]["pages"].length) {
+			boardResults[criteria]["resultat"]["globalResult"] = "Non applicable";
+			nbGlobalNonApplicable++;
+		} else {
+			boardResults[criteria]["resultat"]["globalResult"] = "Conforme";
+			nbGlobalConforme++;
+		}
+	}
 
-    console.log(nbGlobalConforme);
-    console.log(nbGlobalNonConforme);
-    console.log(nbGlobalNonApplicable);
-    console.log(compliancePages);
+	console.log(nbGlobalConforme);
+	console.log(nbGlobalNonConforme);
+	console.log(nbGlobalNonApplicable);
+	console.log(compliancePages);
 
-    console.log(boardResults);
-	console.log(countIssuesByTheme(boardResults));
-}
-
-
-
-const countIssuesByTheme = (boardResults) => {
-    let themeCounts = {};
-
-    // Parcourir chaque résultat dans boardResults
-    boardResults.forEach(result => {
-        // Récupérer le thème du résultat
-        let theme = result.themes;
-
-        // S'assurer que le thème existe dans le comptage des problèmes
-        if (!themeCounts[theme]) {
-            themeCounts[theme] = {
-                minor: 0,
-                major: 0,
-                blocking: 0,
-                total: 0
-            };
-        }
-
-        // Ajouter les problèmes de chaque page associée au thème
-        result.pages.forEach(page => {
-            themeCounts[theme].minor += page.issues.filter(issue => issue.issueUserImpact === langVallydette.userImpact1).length;
-            themeCounts[theme].major += page.issues.filter(issue => issue.issueUserImpact === langVallydette.userImpact2).length;
-            themeCounts[theme].blocking += page.issues.filter(issue => issue.issueUserImpact !== langVallydette.userImpact1 && issue.issueUserImpact !== langVallydette.userImpact2).length;
-        });
-
-        // Calculer le total des problèmes pour ce thème
-        themeCounts[theme].total = themeCounts[theme].minor + themeCounts[theme].major + themeCounts[theme].blocking;
-    });
-
-    return themeCounts;
+	console.log(boardResults);
+	return boardResults;
 }
