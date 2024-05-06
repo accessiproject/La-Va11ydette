@@ -633,7 +633,14 @@ const showAllResultsRgaa = () => {
 		for (let page in dataPages) {
 			complianceAuditResults[criteria]["pages"][page] = {};
 			if (!complianceAuditResultsPerPage[page]) {
-				complianceAuditResultsPerPage[page] = { conforme: 0, nonconforme: 0, na: 0, minor: 0, major: 0, blocking: 0 };
+				complianceAuditResultsPerPage[page] = {
+					nbCompliantCriteriaPerPage: 0,
+					nbNonCompliantCriteriaPerPage: 0,
+					nbNotApplicableCriteriaPerPage: 0,
+					minor: 0,
+					major: 0,
+					blocking: 0
+				};
 			}
 
 
@@ -653,13 +660,13 @@ const showAllResultsRgaa = () => {
 
 			if (dataPages[page]["items"][criteria]["resultatTest"] == "ko") {
 				complianceAuditResults[criteria]["pages"][page]["resultat"] = "Non conforme";
-				complianceAuditResultsPerPage[page]["nonconforme"] += 1;
+				complianceAuditResultsPerPage[page]["nbNonCompliantCriteriaPerPage"] += 1;
 			} else if (dataPages[page]["items"][criteria]["resultatTest"] == "ok") {
 				complianceAuditResults[criteria]["pages"][page]["resultat"] = "Conforme";
-				complianceAuditResultsPerPage[page]["conforme"] += 1;
+				complianceAuditResultsPerPage[page]["nbCompliantCriteriaPerPage"] += 1;
 			} else {
 				complianceAuditResults[criteria]["pages"][page]["resultat"] = "Non applicable";
-				complianceAuditResultsPerPage[page]["na"] += 1;
+				complianceAuditResultsPerPage[page]["nbNotApplicableCriteriaPerPage"] += 1;
 			}
 
 			complianceAuditResults[criteria]["trackingIssues"] = [];
