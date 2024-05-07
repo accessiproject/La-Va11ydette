@@ -652,13 +652,13 @@ const showAllResultsRgaa = () => {
 			for (let userImpact in dataPages[page]["items"][criteria]["issues"]) {
 				if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
 					countMinorIssuesPerCriterion++;
-					complianceAuditResultsPerPage[page]["nbMinorIssuesPerPage"] += 1;
+					complianceAuditResultsPerPage[page].nbMinorIssuesPerPage++;
 				} else if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
 					countMajorIssuesPerCriterion++;
-					complianceAuditResultsPerPage[page]["nbMajorIssuesPerPage"] += 1;
+					complianceAuditResultsPerPage[page].nbBlockingIssuesPerPage++;
 				} else {
 					countBlockingIssuesPerCriterion++;
-					complianceAuditResultsPerPage[page]["nbBlockingIssuesPerPage"] += 1;
+					complianceAuditResultsPerPage[page].nbBlockingIssuesPerPage++;
 				}
 			}
 			complianceAuditResults[criteria]["pages"][page]["issues"] = dataPages[page]["items"][criteria]["issues"];
