@@ -629,9 +629,15 @@ const showAllResultsRgaa = () => {
 		complianceAuditResults[criteria]["verifier"] = dataPages[0]["items"][criteria]["verifier"];
 		complianceAuditResults[criteria]["wcag"] = dataPages[0]["items"][criteria]["wcag"];
 		complianceAuditResults[criteria]["pages"] = [];
+		complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"] = {
+			nbPagesNotCompliantPerCriterion: 0,
+			nbPagesCompliantPerCriterion: 0,
+			nbPagesNotApplicablePerCriterion: 0
+		};
 
 		for (let page in dataPages) {
 			complianceAuditResults[criteria]["pages"][page] = {};
+
 			if (!complianceAuditResultsPerPage[page]) {
 				complianceAuditResultsPerPage[page] = {
 					nbCompliantCriteriaPerPage: 0,
@@ -645,7 +651,7 @@ const showAllResultsRgaa = () => {
 
 			for (let userImpact in dataPages[page]["items"][criteria]["issues"]) {
 				if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
-					countMinorIssuesPerCriterion;
+					countMinorIssuesPerCriterion++;
 					complianceAuditResultsPerPage[page]["nbMinorIssuesPerPage"] += 1;
 				} else if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
 					countMajorIssuesPerCriterion++;
@@ -660,39 +666,38 @@ const showAllResultsRgaa = () => {
 			if (dataPages[page]["items"][criteria]["resultatTest"] == "ko") {
 				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status2;
 				complianceAuditResultsPerPage[page]["nbNonCompliantCriteriaPerPage"] += 1;
+				complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesNotCompliantPerCriterion += 1;
 			} else if (dataPages[page]["items"][criteria]["resultatTest"] == "ok") {
 				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status1;
 				complianceAuditResultsPerPage[page]["nbCompliantCriteriaPerPage"] += 1;
+				complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesCompliantPerCriterion += 1;
 			} else {
 				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status3
 				complianceAuditResultsPerPage[page]["nbNotApplicableCriteriaPerPage"] += 1;
+				complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesNotApplicablePerCriterion += 1;
 			}
 
-			complianceAuditResults[criteria]["trackingIssues"] = [];
+ 			complianceAuditResults[criteria]["trackingIssues"] = [];
 			complianceAuditResults[criteria]["trackingIssues"]["nbMinorIssuesPerCriterion"] = countMinorIssuesPerCriterion;
 			complianceAuditResults[criteria]["trackingIssues"]["nbMajorIssuesPerCriterion"] = countMajorIssuesPerCriterion;
 			complianceAuditResults[criteria]["trackingIssues"]["nbBlockingIssuesPerCriterion"] = countBlockingIssuesPerCriterion;
 			complianceAuditResults[criteria]["trackingIssues"]["nbTotalIssuesPerCriterion"] = countMinorIssuesPerCriterion + countMajorIssuesPerCriterion + countBlockingIssuesPerCriterion;
 		}
 
-		complianceAuditResults[criteria]["resultat"] = {
-			nbconforme: complianceAuditResultsPerPage.reduce((acc, page) => acc + page["conforme"], 0),
-			nbnonconforme: complianceAuditResultsPerPage.reduce((acc, page) => acc + page["nonconforme"], 0),
-			nbnonapplicable: complianceAuditResultsPerPage.reduce((acc, page) => acc + page["na"], 0)
-		};
-
-		if (complianceAuditResults[criteria]["resultat"]["nbnonconforme"] > 0) {
-			complianceAuditResults[criteria]["resultat"]["globalResult"] = langVallydette.template.status2;
+		if (complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesNotCompliantPerCriterion > 0) {
+			complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"]["globalResult"] = langVallydette.template.status2;
 			nbGlobalNonConforme++;
-		} else if (complianceAuditResults[criteria]["resultat"]["nbnonapplicable"] == complianceAuditResults[criteria]["pages"].length) {
-			complianceAuditResults[criteria]["resultat"]["globalResult"] = langVallydette.template.status3;
+		} else if (complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesCompliantPerCriterion == complianceAuditResults[criteria]["pages"].length) {
+			complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"]["globalResult"] = langVallydette.template.status3;
 			nbGlobalNonApplicable++;
 		} else {
-			complianceAuditResults[criteria]["resultat"]["globalResult"] = langVallydette.template.status1;
+			complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"]["globalResult"] = langVallydette.template.status1;
 			nbGlobalConforme++;
 		}
-	}
 
+
+
+	}
 	console.log(nbGlobalConforme);
 	console.log(nbGlobalNonConforme);
 	console.log(nbGlobalNonApplicable);
