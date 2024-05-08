@@ -677,7 +677,7 @@ const showAllResultsRgaa = () => {
 				complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesNotApplicablePerCriterion += 1;
 			}
 
- 			complianceAuditResults[criteria]["trackingIssues"] = [];
+			complianceAuditResults[criteria]["trackingIssues"] = [];
 			complianceAuditResults[criteria]["trackingIssues"]["nbMinorIssuesPerCriterion"] = countMinorIssuesPerCriterion;
 			complianceAuditResults[criteria]["trackingIssues"]["nbMajorIssuesPerCriterion"] = countMajorIssuesPerCriterion;
 			complianceAuditResults[criteria]["trackingIssues"]["nbBlockingIssuesPerCriterion"] = countBlockingIssuesPerCriterion;
@@ -698,11 +698,62 @@ const showAllResultsRgaa = () => {
 
 
 	}
-	console.log(nbGlobalConforme);
-	console.log(nbGlobalNonConforme);
-	console.log(nbGlobalNonApplicable);
-	console.log(complianceAuditResultsPerPage);
+	//console.log(nbGlobalConforme);
+	//console.log(nbGlobalNonConforme);
+	//console.log(nbGlobalNonApplicable);
+	//console.log(complianceAuditResultsPerPage);
 
-	console.log(complianceAuditResults);
+	//console.log(complianceAuditResults);
 	return complianceAuditResults;
 }
+
+const generateResultsPerPage = () => {
+    let dataPages = dataVallydette.checklist.page;
+    let pageResultsArray = [];
+
+    for (let index in dataPages) {
+        // count the number of "ok", "ko" and "na" in each page
+        const countResults = dataPages[index].items.reduce((acc, item) => {
+            if (item.resultatTest === "ok") {
+                acc.countOk++;
+            } else if (item.resultatTest === "ko") {
+                acc.countKo++;
+            } else if (item.resultatTest === "na") {
+                acc.countNa++;
+            }
+            return acc;
+        }, { countOk: 0, countKo: 0, countNa: 0 });
+
+        // calculate the rate of compliance for each page
+        let rateCompliance; // Déplacez la déclaration de rateCompliance ici
+        if (countResults.countOk !== undefined && countResults.countKo !== undefined && (countResults.countOk + countResults.countKo) !== 0) {
+            rateCompliance = countResults.countKo / (countResults.countKo + countResults.countOk) * 100;
+        }
+
+        // count the number of "minor", "major" and "blocking" issues in each page
+        const countIssues = dataPages[index].items.reduce((acc, item) => {
+            item.issues.forEach(issue => {
+                if (issue.issueUserImpact === "Mineur") {
+                    acc.countMinor++;
+                } else if (issue.issueUserImpact === "Majeur") {
+                    acc.countMajor++;
+                } else if (issue.issueUserImpact === "Bloquant") {
+                    acc.countBlocking++;
+                }
+            });
+            return acc;
+        }, { countMinor: 0, countMajor: 0, countBlocking: 0 });
+        countIssues.total = countIssues.countMinor + countIssues.countMajor + countIssues.countBlocking;
+
+        pageResultsArray[index] = {
+            IDPage: dataPages[index].IDPage,
+            name: dataPages[index].name,
+            url: dataPages[index].url,
+            criteria: dataPages[index].items,
+            countResults: countResults,
+            rateCompliance: rateCompliance,
+            countIssues: countIssues
+        };
+    }
+    console.log(pageResultsArray);
+};
