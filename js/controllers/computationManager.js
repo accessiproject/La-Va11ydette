@@ -581,7 +581,7 @@ const countIssuesByTheme = (boardResults) => {
 
 /**
 	*  Get the number of true, false, non-applicable and non-tested by wcag level only.
-	*  If one result is non-tested, then the property 'complete' is passed false, and the final result is not displayed (only the number of non-tested items).
+	*  If one result is non-tested, then the propev  rty 'complete' is passed false, and the final result is not displayed (only the number of non-tested items).
 */
 function dataRGAAComputation() {
 
@@ -607,153 +607,130 @@ function dataRGAAComputation() {
 /**
  * @return {array} complianceAuditResults - Contains blabla
 */
-const showAllResultsRgaa = () => {
+const generateResultsPerPage = () => {
 	let dataPages = dataVallydette.checklist.page;
-	let complianceAuditResults = [];
-	let nbGlobalConforme = 0;
-	let nbGlobalNonConforme = 0;
-	let nbGlobalNonApplicable = 0;
-	let countMinorIssuesPerCriterion = 0;
-	let countMajorIssuesPerCriterion = 0;
-	let countBlockingIssuesPerCriterion = 0;
-	let complianceAuditResultsPerPage = [];
+	let pageResultsArray = [];
 
+	for (let index in dataPages) {
 
-	for (let criteria = 0; criteria < dataPages[0]["items"].length; criteria++) {
-		complianceAuditResults[criteria] = {};
-		complianceAuditResults[criteria]["themes"] = dataPages[0]["items"][criteria]["themes"];
-		complianceAuditResults[criteria]["ID"] = dataPages[0]["items"][criteria]["ID"];
-		complianceAuditResults[criteria]["IDorigin"] = dataPages[0]["items"][criteria]["IDorigin"];
-		complianceAuditResults[criteria]["title"] = dataPages[0]["items"][criteria]["title"];
-		complianceAuditResults[criteria]["goodPractice"] = dataPages[0]["items"][criteria]["goodPractice"];
-		complianceAuditResults[criteria]["verifier"] = dataPages[0]["items"][criteria]["verifier"];
-		complianceAuditResults[criteria]["wcag"] = dataPages[0]["items"][criteria]["wcag"];
-		complianceAuditResults[criteria]["pages"] = [];
-		complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"] = {
-			nbPagesNotCompliantPerCriterion: 0,
-			nbPagesCompliantPerCriterion: 0,
-			nbPagesNotApplicablePerCriterion: 0
-		};
-
-		for (let page in dataPages) {
-			complianceAuditResults[criteria]["pages"][page] = {};
-
-			if (!complianceAuditResultsPerPage[page]) {
-				complianceAuditResultsPerPage[page] = {
-					nbCompliantCriteriaPerPage: 0,
-					nbNonCompliantCriteriaPerPage: 0,
-					nbNotApplicableCriteriaPerPage: 0,
-					nbMinorIssuesPerPage: 0,
-					nbMajorIssuesPerPage: 0,
-					nbBlockingIssuesPerPage: 0
-				};
+		// count the number of "ok", "ko" and "na" in each page
+		const countResults = dataPages[index].items.reduce((acc, item) => {
+			if (item.resultatTest === "ok") {
+				acc.countOk++;
+			} else if (item.resultatTest === "ko") {
+				acc.countKo++;
+			} else if (item.resultatTest === "na") {
+				acc.countNa++;
 			}
+			return acc;
+		}, { countOk: 0, countKo: 0, countNa: 0 });
 
-			for (let userImpact in dataPages[page]["items"][criteria]["issues"]) {
-				if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact1) {
-					countMinorIssuesPerCriterion++;
-					complianceAuditResultsPerPage[page].nbMinorIssuesPerPage++;
-				} else if (dataPages[page]["items"][criteria]["issues"]["issueUserImpact"] == langVallydette.userImpact2) {
-					countMajorIssuesPerCriterion++;
-					complianceAuditResultsPerPage[page].nbBlockingIssuesPerPage++;
-				} else {
-					countBlockingIssuesPerCriterion++;
-					complianceAuditResultsPerPage[page].nbBlockingIssuesPerPage++;
+		// calculate the rate of compliance for each page
+		let rateCompliance; // Déplacez la déclaration de rateCompliance ici
+		if (countResults.countOk !== undefined && countResults.countKo !== undefined && (countResults.countOk + countResults.countKo) !== 0) {
+			rateCompliance = countResults.countKo / (countResults.countKo + countResults.countOk) * 100;
+		}
+
+		// count the number of "minor", "major" and "blocking" issues in each page
+		const countIssues = dataPages[index].items.reduce((acc, item) => {
+			item.issues.forEach(issue => {
+				if (issue.issueUserImpact === "Mineur") {
+					acc.countMinor++;
+				} else if (issue.issueUserImpact === "Majeur") {
+					acc.countMajor++;
+				} else if (issue.issueUserImpact === "Bloquant") {
+					acc.countBlocking++;
 				}
-			}
-			complianceAuditResults[criteria]["pages"][page]["issues"] = dataPages[page]["items"][criteria]["issues"];
+			});
+			return acc;
+		}, { countMinor: 0, countMajor: 0, countBlocking: 0 });
+		countIssues.total = countIssues.countMinor + countIssues.countMajor + countIssues.countBlocking;
 
-			if (dataPages[page]["items"][criteria]["resultatTest"] == "ko") {
-				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status2;
-				complianceAuditResultsPerPage[page]["nbNonCompliantCriteriaPerPage"] += 1;
-				complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesNotCompliantPerCriterion += 1;
-			} else if (dataPages[page]["items"][criteria]["resultatTest"] == "ok") {
-				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status1;
-				complianceAuditResultsPerPage[page]["nbCompliantCriteriaPerPage"] += 1;
-				complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesCompliantPerCriterion += 1;
-			} else {
-				complianceAuditResults[criteria]["pages"][page]["testResult"] = langVallydette.template.status3
-				complianceAuditResultsPerPage[page]["nbNotApplicableCriteriaPerPage"] += 1;
-				complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesNotApplicablePerCriterion += 1;
-			}
-
-			complianceAuditResults[criteria]["trackingIssues"] = [];
-			complianceAuditResults[criteria]["trackingIssues"]["nbMinorIssuesPerCriterion"] = countMinorIssuesPerCriterion;
-			complianceAuditResults[criteria]["trackingIssues"]["nbMajorIssuesPerCriterion"] = countMajorIssuesPerCriterion;
-			complianceAuditResults[criteria]["trackingIssues"]["nbBlockingIssuesPerCriterion"] = countBlockingIssuesPerCriterion;
-			complianceAuditResults[criteria]["trackingIssues"]["nbTotalIssuesPerCriterion"] = countMinorIssuesPerCriterion + countMajorIssuesPerCriterion + countBlockingIssuesPerCriterion;
-		}
-
-		if (complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesNotCompliantPerCriterion > 0) {
-			complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"]["globalResult"] = langVallydette.template.status2;
-			nbGlobalNonConforme++;
-		} else if (complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"].nbPagesCompliantPerCriterion == complianceAuditResults[criteria]["pages"].length) {
-			complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"]["globalResult"] = langVallydette.template.status3;
-			nbGlobalNonApplicable++;
-		} else {
-			complianceAuditResults[criteria]["boardingComplianceResultsPerCriterion"]["globalResult"] = langVallydette.template.status1;
-			nbGlobalConforme++;
-		}
-
-
-
+		pageResultsArray[index] = {
+			IDPage: dataPages[index].IDPage,
+			name: dataPages[index].name,
+			url: dataPages[index].url,
+			criteria: dataPages[index].items,
+			countResults: countResults,
+			rateCompliance: rateCompliance,
+			countIssues: countIssues
+		};
 	}
-	//console.log(nbGlobalConforme);
-	//console.log(nbGlobalNonConforme);
-	//console.log(nbGlobalNonApplicable);
-	//console.log(complianceAuditResultsPerPage);
-
-	//console.log(complianceAuditResults);
-	return complianceAuditResults;
+	//console.log(pageResultsArray);
 }
 
-const generateResultsPerPage = () => {
+
+const showAllResultsRgaa = () => {
     let dataPages = dataVallydette.checklist.page;
-    let pageResultsArray = [];
+    let criteriaArray = [];
 
-    for (let index in dataPages) {
-        // count the number of "ok", "ko" and "na" in each page
-        const countResults = dataPages[index].items.reduce((acc, item) => {
-            if (item.resultatTest === "ok") {
-                acc.countOk++;
-            } else if (item.resultatTest === "ko") {
-                acc.countKo++;
-            } else if (item.resultatTest === "na") {
-                acc.countNa++;
+    for (let i = 0; i < dataPages[0]["items"].length; i++) {
+        let pages = [];
+        let countResults = { countOk: 0, countKo: 0, countNa: 0 };
+        let countIssues = { countMinor: 0, countMajor: 0, countBlocking: 0, total: 0 };
+
+        for (let page = 0; page < dataPages.length; page++) {
+            let currentItem = dataPages[page].items[i];
+
+            // Vérifier le résultatTest de l'item actuel et incrémenter les compteurs appropriés
+            if (currentItem.resultatTest === "ok") {
+                countResults.countOk++;
+            } else if (currentItem.resultatTest === "ko") {
+                countResults.countKo++;
+            } else if (currentItem.resultatTest === "na") {
+                countResults.countNa++;
             }
-            return acc;
-        }, { countOk: 0, countKo: 0, countNa: 0 });
 
-        // calculate the rate of compliance for each page
-        let rateCompliance; // Déplacez la déclaration de rateCompliance ici
-        if (countResults.countOk !== undefined && countResults.countKo !== undefined && (countResults.countOk + countResults.countKo) !== 0) {
-            rateCompliance = countResults.countKo / (countResults.countKo + countResults.countOk) * 100;
-        }
-
-        // count the number of "minor", "major" and "blocking" issues in each page
-        const countIssues = dataPages[index].items.reduce((acc, item) => {
-            item.issues.forEach(issue => {
+            // Ajouter les détails de la page à l'array 'pages'
+            pages.push({
+                name: dataPages[page].name,
+                url: dataPages[page].url,
+                resultatTest: currentItem.resultatTest,
+                issues: currentItem.issues
+            });
+            
+            // Incrémenter les compteurs d'issues appropriés pour chaque issue de l'item actuel
+            currentItem.issues.forEach(issue => {
                 if (issue.issueUserImpact === "Mineur") {
-                    acc.countMinor++;
+                    countIssues.countMinor++;
                 } else if (issue.issueUserImpact === "Majeur") {
-                    acc.countMajor++;
+                    countIssues.countMajor++;
                 } else if (issue.issueUserImpact === "Bloquant") {
-                    acc.countBlocking++;
+                    countIssues.countBlocking++;
                 }
             });
-            return acc;
-        }, { countMinor: 0, countMajor: 0, countBlocking: 0 });
+        }
+
+        // Calculer le total des issues
         countIssues.total = countIssues.countMinor + countIssues.countMajor + countIssues.countBlocking;
 
-        pageResultsArray[index] = {
-            IDPage: dataPages[index].IDPage,
-            name: dataPages[index].name,
-            url: dataPages[index].url,
-            criteria: dataPages[index].items,
+        let compliance;
+        if (countResults.countKo > 0) {
+            compliance = langVallydette.template.status2;
+        } else if (countResults.countNa == dataPages.length) {
+            compliance = langVallydette.template.status3;
+        } else {
+            compliance = langVallydette.template.status1;
+        }
+
+        // Ajouter les résultats comptés à 'results' pour chaque critère
+        let currentCriterion = dataPages[0]["items"][i];
+
+        // Créer l'objet pour chaque critère
+        criteriaArray[i] = {
+            topic: currentCriterion["themes"],
+            ID: currentCriterion["ID"],
+            IDorigin: currentCriterion["IDorigin"],
+            title: currentCriterion["title"],
+            goodPractice: currentCriterion["goodPractice"],
+            verifier: currentCriterion["verifier"],
+            wcag: currentCriterion["wcag"],
+            pages: pages,
             countResults: countResults,
-            rateCompliance: rateCompliance,
-            countIssues: countIssues
+            countIssues: countIssues,
+            result: compliance
         };
     }
-    console.log(pageResultsArray);
+
+    console.log(criteriaArray);
 };
