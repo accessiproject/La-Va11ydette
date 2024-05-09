@@ -605,15 +605,18 @@ function dataRGAAComputation() {
 }
 
 /**
- * @return {array} complianceAuditResults - Contains blabla
-*/
-const generateResultsPerPage = () => {
+ * Retrieves an array of audit results for each page.
+ * @returns {array} pagesArray - An array containing the results for each page of the audit.
+ */
+const getPagesArray = () => {
+
+	// Retrieve checklist pages from dataVallydette
 	let dataPages = dataVallydette.checklist.page;
-	let pageResultsArray = [];
+	let pagesArray = [];
 
 	for (let index in dataPages) {
 
-		// count the number of "ok", "ko" and "na" in each page
+		// Count the number of "ok", "ko", and "na" results in each page
 		const countResults = dataPages[index].items.reduce((acc, item) => {
 			if (item.resultatTest === "ok") {
 				acc.countOk++;
@@ -625,13 +628,13 @@ const generateResultsPerPage = () => {
 			return acc;
 		}, { countOk: 0, countKo: 0, countNa: 0 });
 
-		// calculate the rate of compliance for each page
-		let rateCompliance; // Déplacez la déclaration de rateCompliance ici
+		// Calculate the rate of compliance for each page
+		let rateCompliance; // Declare rateCompliance here to avoid hoisting
 		if (countResults.countOk !== undefined && countResults.countKo !== undefined && (countResults.countOk + countResults.countKo) !== 0) {
 			rateCompliance = countResults.countKo / (countResults.countKo + countResults.countOk) * 100;
 		}
 
-		// count the number of "minor", "major" and "blocking" issues in each page
+		// Count the number of "minor", "major", and "blocking" issues in each page
 		const countIssues = dataPages[index].items.reduce((acc, item) => {
 			item.issues.forEach(issue => {
 				if (issue.issueUserImpact === "Mineur") {
@@ -646,7 +649,8 @@ const generateResultsPerPage = () => {
 		}, { countMinor: 0, countMajor: 0, countBlocking: 0 });
 		countIssues.total = countIssues.countMinor + countIssues.countMajor + countIssues.countBlocking;
 
-		pageResultsArray[index] = {
+		// Store results for the current page in pageResultsArray
+		pagesArray[index] = {
 			IDPage: dataPages[index].IDPage,
 			name: dataPages[index].name,
 			url: dataPages[index].url,
@@ -655,24 +659,42 @@ const generateResultsPerPage = () => {
 			rateCompliance: rateCompliance,
 			countIssues: countIssues
 		};
+
 	}
-	return pageResultsArray;
+
+	return pagesArray;
 }
 
-
-const showAllResultsRgaa = () => {
+/**
+ * Retrieves an array of criteria along with their results for each page.
+ * @returns {array} criteriaArray - An array containing criteria and their associated results.
+ */
+const getCriteriaArray = () => {
 	let dataPages = dataVallydette.checklist.page;
 	let criteriaArray = [];
 
 	for (let i = 0; i < dataPages[0]["items"].length; i++) {
+		
 		let pages = [];
-		let countResults = { countOk: 0, countKo: 0, countNa: 0 };
-		let countIssues = { countMinor: 0, countMajor: 0, countBlocking: 0, total: 0 };
+		
+		let countResults = {
+			countOk: 0,
+			countKo: 0,
+			countNa: 0
+		};
+
+		let countIssues = {
+			countMinor: 0,
+			countMajor: 0,
+			countBlocking: 0,
+			total: 0
+		};
 
 		for (let page = 0; page < dataPages.length; page++) {
+
 			let currentItem = dataPages[page].items[i];
 
-			// Vérifier le résultatTest de l'item actuel et incrémenter les compteurs appropriés
+			// Count results for each criteria
 			if (currentItem.resultatTest === "ok") {
 				countResults.countOk++;
 			} else if (currentItem.resultatTest === "ko") {
@@ -681,7 +703,7 @@ const showAllResultsRgaa = () => {
 				countResults.countNa++;
 			}
 
-			// Ajouter les détails de la page à l'array 'pages'
+			// Gather information about each page's results
 			pages.push({
 				name: dataPages[page].name,
 				url: dataPages[page].url,
@@ -689,7 +711,7 @@ const showAllResultsRgaa = () => {
 				issues: currentItem.issues
 			});
 
-			// Incrémenter les compteurs d'issues appropriés pour chaque issue de l'item actuel
+			// Count issues for each criteria
 			currentItem.issues.forEach(issue => {
 				if (issue.issueUserImpact === "Mineur") {
 					countIssues.countMinor++;
@@ -701,9 +723,10 @@ const showAllResultsRgaa = () => {
 			});
 		}
 
-		// Calculer le total des issues
+		// Calculate total issues for each criteria
 		countIssues.total = countIssues.countMinor + countIssues.countMajor + countIssues.countBlocking;
 
+		// Determine compliance status for each criteria
 		let compliance;
 		if (countResults.countKo > 0) {
 			compliance = langVallydette.template.status2;
@@ -713,10 +736,8 @@ const showAllResultsRgaa = () => {
 			compliance = langVallydette.template.status1;
 		}
 
-		// Ajouter les résultats comptés à 'results' pour chaque critère
+		// Gather information about each criteria
 		let currentCriterion = dataPages[0]["items"][i];
-
-		// Créer l'objet pour chaque critère
 		criteriaArray[i] = {
 			topic: currentCriterion["themes"],
 			ID: currentCriterion["ID"],
@@ -730,24 +751,33 @@ const showAllResultsRgaa = () => {
 			countIssues: countIssues,
 			result: compliance
 		};
+
 	}
 
 	return criteriaArray;
 }
 
-const getComplianceRates = () => {
-	const pagesArray = generateResultsPerPage();
-	const criteriaArray = showAllResultsRgaa();
+
+/**
+ * Retrieves an array of compliance statistics based on audit results.
+ * @returns {array} compliancesArray - An array containing various compliance statistics.
+ */
+const getCompliancesArray = () => {
+	
+	// Retrieve audit results for each page and criteria
+	const pagesArray = getPagesArray();
+	const criteriaArray = getCriteriaArray();
 	const compliancesArray = [];
 
-	let somme = 0;
+	// Calculate the average compliance rate across all pages
+	let sum = 0;
 	let medium = 0;
 	for (let page in pagesArray) {
-		somme += pagesArray[page].rateCompliance;
+		sum += pagesArray[page].rateCompliance;
 	}
-	medium = somme / pagesArray.length;
+	medium = sum / pagesArray.length;
 
-	// count the number of "ok", "ko" and "na" in each page
+	// Count the number of "ok", "ko", and "na" results for all criteria
 	let global = 0;
 	const countResults = criteriaArray.reduce((acc, item) => {
 		if (item.result === langVallydette.template.status1) {
@@ -761,44 +791,63 @@ const getComplianceRates = () => {
 	}, { countOk: 0, countKo: 0, countNa: 0 });
 	global = countResults.countOk / (countResults.countOk + countResults.countKo) * 100;
 
-
+	// Store compliance statistics in compliancesArray
 	compliancesArray["counts"] = countResults;
 	compliancesArray["medium"] = medium;
 	compliancesArray["global"] = global;
 
-
-
 	return compliancesArray;
 }
 
-const getResultsPerTopic = () => {
-    const criteriaArray = showAllResultsRgaa();
-    const resultsPerTopic = {};
+/**
+ * Retrieves an array of compliance statistics for each topic.
+ * @returns {array} topicsArray - An array containing compliance statistics for each topic.
+ */
+const getTopicsArray = () => {
 
-    for (let i = 0; i < criteriaArray.length; i++) {
-        const topic = criteriaArray[i].topic;
-        if (!resultsPerTopic[topic]) {
-            resultsPerTopic[topic] = {
-                countOk: 0,
-                countKo: 0,
-                countNa: 0
-            };
-        }
+	// Retrieve criteria and their results
+	const criteriaArray = getCriteriaArray();
+	const resultsPerTopic = {};
 
-        if (criteriaArray[i].result === langVallydette.template.status1) {
-            resultsPerTopic[topic].countOk++;
-        } else if (criteriaArray[i].result === langVallydette.template.status2) {
-            resultsPerTopic[topic].countKo++;
-        } else if (criteriaArray[i].result === langVallydette.template.status3) {
-            resultsPerTopic[topic].countNa++;
-        }
-    }
+	// Count the number of "ok", "ko", and "na" results for each topic
+	for (let i = 0; i < criteriaArray.length; i++) {
+		const topic = criteriaArray[i].topic;
+		if (!resultsPerTopic[topic]) {
+			resultsPerTopic[topic] = {
+				countOk: 0,
+				countKo: 0,
+				countNa: 0
+			};
+		}
 
-    // Convertir l'objet en tableau si nécessaire
-    const resultsArray = Object.keys(resultsPerTopic).map(topic => ({
-        topic,
-        ...resultsPerTopic[topic]
-    }));
+		if (criteriaArray[i].result === langVallydette.template.status1) {
+			resultsPerTopic[topic].countOk++;
+		} else if (criteriaArray[i].result === langVallydette.template.status2) {
+			resultsPerTopic[topic].countKo++;
+		} else if (criteriaArray[i].result === langVallydette.template.status3) {
+			resultsPerTopic[topic].countNa++;
+		}
+	}
+
+	// Format compliance statistics for each topic into an array
+	const topicsArray = Object.keys(resultsPerTopic).map(topic => ({
+		topic,
+		...resultsPerTopic[topic]
+	}));
+
+	return topicsArray;
+}
+
+/**
+ * returns {array} resultsArray
+*/
+const getResultsArray = () => {
+
+	const resultsArray = [];
+	resultsArray["pages"] = getPagesArray();
+	resultsArray["criteria"] = getCriteriaArray();
+	resultsArray["topics"] = getTopicsArray();
+	resultsArray["compliances"] = getCompliancesArray();
 	console.log(resultsArray);
-    return resultsArray;
+	return resultsArray;
 }
