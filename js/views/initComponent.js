@@ -558,8 +558,10 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 	computationContent += '</table>';
 	computationContent += ' </div>';
 	computationContent += ' </div>';
-showAllResultsRgaa();
+//showAllResultsRgaa();
 //generateResultsPerPage();
+//getComplianceRates();
+ getResultsPerTopic();
 	computationContent += '</div>'
 
 

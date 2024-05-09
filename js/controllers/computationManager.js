@@ -656,81 +656,149 @@ const generateResultsPerPage = () => {
 			countIssues: countIssues
 		};
 	}
-	//console.log(pageResultsArray);
+	return pageResultsArray;
 }
 
 
 const showAllResultsRgaa = () => {
-    let dataPages = dataVallydette.checklist.page;
-    let criteriaArray = [];
+	let dataPages = dataVallydette.checklist.page;
+	let criteriaArray = [];
 
-    for (let i = 0; i < dataPages[0]["items"].length; i++) {
-        let pages = [];
-        let countResults = { countOk: 0, countKo: 0, countNa: 0 };
-        let countIssues = { countMinor: 0, countMajor: 0, countBlocking: 0, total: 0 };
+	for (let i = 0; i < dataPages[0]["items"].length; i++) {
+		let pages = [];
+		let countResults = { countOk: 0, countKo: 0, countNa: 0 };
+		let countIssues = { countMinor: 0, countMajor: 0, countBlocking: 0, total: 0 };
 
-        for (let page = 0; page < dataPages.length; page++) {
-            let currentItem = dataPages[page].items[i];
+		for (let page = 0; page < dataPages.length; page++) {
+			let currentItem = dataPages[page].items[i];
 
-            // Vérifier le résultatTest de l'item actuel et incrémenter les compteurs appropriés
-            if (currentItem.resultatTest === "ok") {
-                countResults.countOk++;
-            } else if (currentItem.resultatTest === "ko") {
-                countResults.countKo++;
-            } else if (currentItem.resultatTest === "na") {
-                countResults.countNa++;
-            }
+			// Vérifier le résultatTest de l'item actuel et incrémenter les compteurs appropriés
+			if (currentItem.resultatTest === "ok") {
+				countResults.countOk++;
+			} else if (currentItem.resultatTest === "ko") {
+				countResults.countKo++;
+			} else if (currentItem.resultatTest === "na") {
+				countResults.countNa++;
+			}
 
-            // Ajouter les détails de la page à l'array 'pages'
-            pages.push({
-                name: dataPages[page].name,
-                url: dataPages[page].url,
-                resultatTest: currentItem.resultatTest,
-                issues: currentItem.issues
-            });
-            
-            // Incrémenter les compteurs d'issues appropriés pour chaque issue de l'item actuel
-            currentItem.issues.forEach(issue => {
-                if (issue.issueUserImpact === "Mineur") {
-                    countIssues.countMinor++;
-                } else if (issue.issueUserImpact === "Majeur") {
-                    countIssues.countMajor++;
-                } else if (issue.issueUserImpact === "Bloquant") {
-                    countIssues.countBlocking++;
-                }
-            });
+			// Ajouter les détails de la page à l'array 'pages'
+			pages.push({
+				name: dataPages[page].name,
+				url: dataPages[page].url,
+				resultatTest: currentItem.resultatTest,
+				issues: currentItem.issues
+			});
+
+			// Incrémenter les compteurs d'issues appropriés pour chaque issue de l'item actuel
+			currentItem.issues.forEach(issue => {
+				if (issue.issueUserImpact === "Mineur") {
+					countIssues.countMinor++;
+				} else if (issue.issueUserImpact === "Majeur") {
+					countIssues.countMajor++;
+				} else if (issue.issueUserImpact === "Bloquant") {
+					countIssues.countBlocking++;
+				}
+			});
+		}
+
+		// Calculer le total des issues
+		countIssues.total = countIssues.countMinor + countIssues.countMajor + countIssues.countBlocking;
+
+		let compliance;
+		if (countResults.countKo > 0) {
+			compliance = langVallydette.template.status2;
+		} else if (countResults.countNa == dataPages.length) {
+			compliance = langVallydette.template.status3;
+		} else {
+			compliance = langVallydette.template.status1;
+		}
+
+		// Ajouter les résultats comptés à 'results' pour chaque critère
+		let currentCriterion = dataPages[0]["items"][i];
+
+		// Créer l'objet pour chaque critère
+		criteriaArray[i] = {
+			topic: currentCriterion["themes"],
+			ID: currentCriterion["ID"],
+			IDorigin: currentCriterion["IDorigin"],
+			title: currentCriterion["title"],
+			goodPractice: currentCriterion["goodPractice"],
+			verifier: currentCriterion["verifier"],
+			wcag: currentCriterion["wcag"],
+			pages: pages,
+			countResults: countResults,
+			countIssues: countIssues,
+			result: compliance
+		};
+	}
+
+	return criteriaArray;
+}
+
+const getComplianceRates = () => {
+	const pagesArray = generateResultsPerPage();
+	const criteriaArray = showAllResultsRgaa();
+	const compliancesArray = [];
+
+	let somme = 0;
+	let medium = 0;
+	for (let page in pagesArray) {
+		somme += pagesArray[page].rateCompliance;
+	}
+	medium = somme / pagesArray.length;
+
+	// count the number of "ok", "ko" and "na" in each page
+	let global = 0;
+	const countResults = criteriaArray.reduce((acc, item) => {
+		if (item.result === langVallydette.template.status1) {
+			acc.countOk++;
+		} else if (item.result === langVallydette.template.status2) {
+			acc.countKo++;
+		} else if (item.result === langVallydette.template.status3) {
+			acc.countNa++;
+		}
+		return acc;
+	}, { countOk: 0, countKo: 0, countNa: 0 });
+	global = countResults.countOk / (countResults.countOk + countResults.countKo) * 100;
+
+
+	compliancesArray["counts"] = countResults;
+	compliancesArray["medium"] = medium;
+	compliancesArray["global"] = global;
+
+
+
+	return compliancesArray;
+}
+
+const getResultsPerTopic = () => {
+    const criteriaArray = showAllResultsRgaa();
+    const resultsPerTopic = {};
+
+    for (let i = 0; i < criteriaArray.length; i++) {
+        const topic = criteriaArray[i].topic;
+        if (!resultsPerTopic[topic]) {
+            resultsPerTopic[topic] = {
+                countOk: 0,
+                countKo: 0,
+                countNa: 0
+            };
         }
 
-        // Calculer le total des issues
-        countIssues.total = countIssues.countMinor + countIssues.countMajor + countIssues.countBlocking;
-
-        let compliance;
-        if (countResults.countKo > 0) {
-            compliance = langVallydette.template.status2;
-        } else if (countResults.countNa == dataPages.length) {
-            compliance = langVallydette.template.status3;
-        } else {
-            compliance = langVallydette.template.status1;
+        if (criteriaArray[i].result === langVallydette.template.status1) {
+            resultsPerTopic[topic].countOk++;
+        } else if (criteriaArray[i].result === langVallydette.template.status2) {
+            resultsPerTopic[topic].countKo++;
+        } else if (criteriaArray[i].result === langVallydette.template.status3) {
+            resultsPerTopic[topic].countNa++;
         }
-
-        // Ajouter les résultats comptés à 'results' pour chaque critère
-        let currentCriterion = dataPages[0]["items"][i];
-
-        // Créer l'objet pour chaque critère
-        criteriaArray[i] = {
-            topic: currentCriterion["themes"],
-            ID: currentCriterion["ID"],
-            IDorigin: currentCriterion["IDorigin"],
-            title: currentCriterion["title"],
-            goodPractice: currentCriterion["goodPractice"],
-            verifier: currentCriterion["verifier"],
-            wcag: currentCriterion["wcag"],
-            pages: pages,
-            countResults: countResults,
-            countIssues: countIssues,
-            result: compliance
-        };
     }
 
-    console.log(criteriaArray);
-};
+    // Convertir l'objet en tableau si nécessaire
+    const resultsArray = Object.keys(resultsPerTopic).map(topic => ({
+        topic,
+        ...resultsPerTopic[topic]
+    }));
+	console.log(resultsArray);
+    return resultsArray;
+}
