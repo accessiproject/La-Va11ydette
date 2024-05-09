@@ -535,30 +535,34 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 	/**
 	 * board of results
 	 **/
+	const results = getResultsArray();
 	computationContent += '<div class="tab-pane" id="test" role="tabpanel" aria-labelledby="idTabTest">';
 	computationContent += '<div class="table-responsive">'
 	computationContent += '<table class="table table-striped">';
 	computationContent += '<thead><tr><th scope="col">Thématique</th><th scope="col">Critère</th>';
-	for (let i in pagesResultsArray) {
-	computationContent += `<th scope="col">${pagesResultsArray[i].name}</th>`;
+
+	for (let i = 0; i < results["pages"].length; i++) {
+		computationContent += `<th scope="col">${results["pages"][i]["name"]}</th>`;
 	}
-	computationContent += '</tr></thead><tbody>';
-	for (let i=0;i<pagesResultsArray[0]["items"].length;i++) {
+	computationContent += '<th>Conformité</th></tr></thead><tbody>';
+	for (let i = 0; i < results["criteria"].length; i++) {
 		computationContent += `
 			<tr>
-				<td scope="row" class="font-weight-bold">${pagesResultsArray[0]["items"][i]["themes"]}</td>
-				<td scope="row" class="font-weight-bold">${pagesResultsArray[0]["items"][i]["name"]}</td>
+				<td scope="row" class="font-weight-bold">${results["criteria"][i].topic}</td>
+				<td scope="row" class="font-weight-bold">${results["criteria"][i].title}</td>
 		`;
-		for (let j=0;j<pagesResultsArray.length;j++) {
-			computationContent += `<td class="font-weight-bold">${pagesResultsArray[j]["items"][i]["resultat"]}</td>`;
+		for (let j=0;j<results["criteria"][i]["pages"].length;j++) {
+			computationContent += `<td class="font-weight-bold">${results["criteria"][i]["pages"][j]["resultatTest"]}</td>`;
 		}
+		computationContent += `<td class="font-weight-bold">${results["criteria"][i].result}</td>`;
+
 		computationContent += `</tr>`;
 	}
 	computationContent += '</tbody>';
 	computationContent += '</table>';
 	computationContent += ' </div>';
 	computationContent += ' </div>';
-getResultsArray();
+
 	computationContent += '</div>'
 
 
