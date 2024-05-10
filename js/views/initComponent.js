@@ -494,53 +494,15 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 	computationContent += ' </div>';
 	computationContent += ' </div>';
 
-	computationContent += ' <div class="tab-pane" id="nonConformites" role="tabpanel" aria-labelledby="tabNonConformites">';
-	/** 
-				*	Display the non-conformity list.
-				*	@param {object} listNonConformity - object of the falses wcag rules.
-			*/
-	const listNonConformity = dataRGAA.items.filter(dataRGAAResult => dataRGAAResult.resultat === false);
-
-	if (listNonConformity.length > 0) {
-
-		for (let i in listNonConformity) {
-
-			computationContent += '<ul>';
-			computationContent += '<li><strong>' + listNonConformity[i].name + '</strong>';
-
-			/** Remove undefined values */
-			listNonConformity[i].comment = listNonConformity[i].comment.filter(x => x);
-
-			if (listNonConformity[i].comment.length > 0) {
-
-				computationContent += '<ul>';
-				for (let j in listNonConformity[i].comment) {
-					computationContent += '<li>' + utils.htmlEntities(listNonConformity[i].comment[j]) + ' <span class="badge bg-light">' + utils.htmlEntities(listNonConformity[i].page[j]) + '</span></li>';
-				}
-				computationContent += '</ul>';
-			}
-
-			computationContent += '</li>';
-			computationContent += '</ul>';
-
-		}
-
-	} else {
-
-		computationContent += '<p>' + langVallydette.auditTxt11 + '</p>';
-
-	}
-	computationContent += '</div>'
-
 	/**
 	 * board of results
 	 **/
-	const results = getResultsArray();
 	computationContent += '<div class="tab-pane" id="test" role="tabpanel" aria-labelledby="idTabTest">';
 	computationContent += '<div class="table-responsive">'
-	computationContent += '<table class="table table-striped">';
+	computationContent += '<table id="exemple" class="table table-striped">';
 	computationContent += '<thead><tr><th scope="col">Thématique</th><th scope="col">Critère</th>';
 
+	const results = getResultsArray();
 	for (let i = 0; i < results["pages"].length; i++) {
 		computationContent += `<th scope="col">${results["pages"][i]["name"]}</th>`;
 	}
@@ -551,7 +513,7 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 				<td scope="row" class="font-weight-bold">${results["criteria"][i].topic}</td>
 				<td scope="row" class="font-weight-bold">${results["criteria"][i].title}</td>
 		`;
-		for (let j=0;j<results["criteria"][i]["pages"].length;j++) {
+		for (let j = 0; j < results["criteria"][i]["pages"].length; j++) {
 			computationContent += `<td class="font-weight-bold">${results["criteria"][i]["pages"][j]["resultatTest"]}</td>`;
 		}
 		computationContent += `<td class="font-weight-bold">${results["criteria"][i].result}</td>`;
@@ -563,8 +525,7 @@ const runFinalComputationRGAA = (pagesResultsArray) => {
 	computationContent += ' </div>';
 	computationContent += ' </div>';
 
-	computationContent += '</div>'
-
+	computationContent += '</div>';
 
 	htmlMainContent.innerHTML = computationContent;
 }

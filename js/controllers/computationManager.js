@@ -695,19 +695,23 @@ const getCriteriaArray = () => {
 			let currentItem = dataPages[page].items[i];
 
 			// Count results for each criteria
+			let resultatTest = "";
 			if (currentItem.resultatTest === "ok") {
 				countResults.countOk++;
+				resultatTest = langVallydette.template.status1;
 			} else if (currentItem.resultatTest === "ko") {
 				countResults.countKo++;
+				resultatTest = langVallydette.template.status2;
 			} else if (currentItem.resultatTest === "na") {
 				countResults.countNa++;
+				resultatTest = langVallydette.template.status3;
 			}
 
 			// Gather information about each page's results
 			pages.push({
 				name: dataPages[page].name,
 				url: dataPages[page].url,
-				resultatTest: currentItem.resultatTest,
+				resultatTest: resultatTest,
 				issues: currentItem.issues
 			});
 
